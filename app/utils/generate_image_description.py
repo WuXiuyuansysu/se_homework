@@ -6,6 +6,7 @@ import re
 
 def generate_image_description(recipe):
     """生成菜品外貌描述"""
+    
     prompt = f"""
         你是一个专业美食摄影师，需要根据以下菜谱生成菜品外观的详细描述。
         请严格按照以下规则输出：
@@ -37,34 +38,19 @@ def generate_image_description(recipe):
         base_url="https://api.suanli.cn/v1"
     )
     
-    try:
-        response = client.chat.completions.create(
-            model="free:Qwen3-30B-A3B",
-            messages=[
-                {"role": "system", "content": "你是一个专业摄影师，输出必须是纯净的 JSON 对象，不要任何额外文本"},
-                {"role": "user", "content": prompt}
-            ],
-            response_format={"type": "json_object"}  # 强制 JSON 格式
-        )
-        raw_content = response.choices[0].message.content
-        
-        # 直接尝试解析 JSON
-        try:
-            return json.loads(raw_content)
-        except json.JSONDecodeError:
-            # 清理后重试
-            cleaned_content = re.sub(r'[\s\n]+', ' ', raw_content).strip()
-            return json.loads(cleaned_content)
-            
-    except openai.APIError as e:
-        print(f"OpenAI API 错误: {e}")
-        raise
-    except json.JSONDecodeError as e:
-        print("JSON 解析失败，原始内容:", raw_content)
-        raise ValueError("API 返回无效 JSON") from e
-    except Exception as e:
-        print(f"未知错误: {e}")
-        raise
+    response = client.chat.completions.create(
+        model="free:Qwen3-30B-A3B",
+        messages=[
+            {"role": "system", "content": "你是一个专业摄影师，输出必须是纯净的 JSON 对象，不要任何额外文本"},
+            {"role": "user", "content": prompt}
+        ],
+        response_format={"type": "json_object"}  # 强制 JSON 格式
+    )
+    json_content = json.loads(response.choices[0].message.content)
+    
+    return json_content
+
+
 
 if __name__ == "__main__":
     recipe_example = {
