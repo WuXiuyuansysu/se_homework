@@ -3,9 +3,11 @@ from utils.generate_recipe import generate_recipe
 from utils.generate_image_description import generate_image_description
 from utils.generate_dish_image import generate_dish_image
 from utils.generate_steps_image import generate_steps_image
+
 from PIL import Image
 import requests
 import os
+
 import base64
 from io import BytesIO
 
@@ -22,12 +24,12 @@ def generate():
     cuisine_type = request.form.get('cuisine_type')
     
     try:
-        # 生成菜谱
         recipe = generate_recipe(
             ingredients=ingredients,
             cuisine_type=cuisine_type
         )
         
+
         # 生成菜品外貌描述
         appearance_desc = generate_image_description(recipe)
         img = generate_dish_image(appearance_desc)
@@ -50,6 +52,7 @@ def generate():
             "recipe": recipe,
             "steps_images": step_base64,
             "dish_image": img_base64
+
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
