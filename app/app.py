@@ -3,7 +3,13 @@ from utils.generate_recipe import generate_recipe
 from utils.generate_image_description import generate_image_description
 from utils.generate_dish_image import generate_dish_image
 from utils.generate_steps_image import generate_steps_image
+
+from PIL import Image
+import requests
+import os
+
 import base64
+from io import BytesIO
 
 app = Flask(__name__)
 #app.config['UPLOAD_FOLDER'] = 'static/images'
@@ -23,27 +29,30 @@ def generate():
             cuisine_type=cuisine_type
         )
         
-        """
-        generate_steps_image返回list, 其每个元素是一个Image对象, 图像内容某个做菜的步骤
-        generate_image_description返回json, 内容是对最终菜肴图像生成的建议
-        generate_dish_image返回Image对象,图像内容是最终菜肴的图像
 
-        所有的图片都保存在 ./pictures下面:
-            步骤图片命名为1.png...(前缀取决于recipe[steps][item][step]的内容）
-            最终菜肴命名为dish_image.png
+        # 生成菜品外貌描述
+        appearance_desc = generate_image_description(recipe)
+        img = generate_dish_image(appearance_desc)
+        # 将图片转换为base64编码
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
+        # 生成每个步骤的图片描述
+        step_imgs = generate_steps_image(recipe)
+        step_base64 = []
+        for image in step_imgs:
+            buffered = BytesIO()
+            image.save(buffered, format="PNG")
+            step_base64.append(base64.b64encode(buffered.getvalue()).decode('utf-8'))
 
-        test.py中运行了所有后端的流程
-        每个函数对应的文件下面设置了对应的测试代码
-        请根据后端函数返回值更改generate()的返回值以适应前端需求
-        """
-        steps_img = generate_steps_image(recipe)
-        dish_desciption = generate_image_description(recipe)
-        dish_img = generate_dish_image(dish_desciption)
         
-        
+        # 返回组合数据
         return jsonify({
             "recipe": recipe,
-            
+            "steps_images": step_base64,
+            "dish_image": img_base64
+
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
