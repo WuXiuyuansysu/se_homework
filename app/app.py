@@ -3,7 +3,11 @@ from utils.generate_recipe import generate_recipe
 from utils.generate_image_description import generate_image_description
 from utils.generate_dish_image import generate_dish_image
 from utils.generate_steps_image import generate_steps_image
+<<<<<<< HEAD
 from utils.generate_nutritional_analysis import generate_nutrition_analysis
+=======
+
+>>>>>>> refs/remotes/origin/main
 from PIL import Image
 import requests
 import os
@@ -53,8 +57,13 @@ def generate():
         return jsonify({
             "recipe": recipe,
             "steps_images": step_base64,
+<<<<<<< HEAD
             "dish_image": img_base64, 
             "nutrition": dish_nutrition 
+=======
+            "dish_image": img_base64
+
+>>>>>>> refs/remotes/origin/main
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
