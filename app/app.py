@@ -55,7 +55,6 @@ def generate():
             "steps_images": step_base64,
             "dish_image": img_base64, 
             "nutrition": dish_nutrition 
-
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500

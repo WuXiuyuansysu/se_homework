@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button class="export-btn" id="export-txt">📝 导出为TXT</button>
                     <button class="export-btn" id="export-dish-png">🖼️ 导出主菜图片</button>
                     <button class="export-btn" id="export-steps-zip">📚 导出步骤图片包</button>
+                    <button class="export-btn" id="export-pdf">📄 导出为PDF</button>
                 </div>
                 <div class="recipe-content">
                     <div class="recipe-header">
@@ -72,8 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <!-- 菜品图片展示 -->
                         <div class="dish-image-container">
                             <img src="data:image/png;base64,${data.dish_image}" 
-                                 alt="${data.recipe.name}" 
-                                 class="dish-image">
+                                alt="${data.recipe.name}" 
+                                class="dish-image">
                             <p class="dish-description">${data.dish_description}</p>
                         </div>
                         
@@ -82,6 +83,43 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="meta-icon">⏱</span>
                                 <span>总时长：${data.recipe.total_time}</span>
                             </div>
+                            <!-- 新增热量元数据 -->
+                            <div class="meta-item">
+                                <span class="meta-icon">🔥</span>
+                                <span>热量：${data.nutrition.calories || 'N/A'}大卡</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 新增营养分析部分 -->
+                    <div class="section nutrition-section">
+                        <h3>营养分析</h3>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <span class="nutrition-label">蛋白质</span>
+                                <span class="nutrition-value">${data.nutrition.protein || 'N/A'}g</span>
+                            </div>
+                            <div class="nutrition-item">
+                                <span class="nutrition-label">脂肪</span>
+                                <span class="nutrition-value">${data.nutrition.fat || 'N/A'}g</span>
+                            </div>
+                            <div class="nutrition-item">
+                                <span class="nutrition-label">碳水化合物</span>
+                                <span class="nutrition-value">${data.nutrition.carbohydrates || 'N/A'}g</span>
+                            </div>
+                        </div>
+                        
+                        <div class="nutrition-details">
+                            <h4>关键营养素</h4>
+                            <ul class="nutrients-list">
+                                ${(data.nutrition.key_nutrients || []).map(nutrient => `
+                                    <li class="nutrient-item">
+                                        <strong>${nutrient.nutrient}:</strong> 
+                                        ${nutrient.amount}${nutrient.unit}
+                                        <span class="nutrient-source">(来源: ${nutrient.source})</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
                         </div>
                     </div>
 
@@ -96,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             `).join('')}
                         </div>
                     </div>
+
 
                     <div class="section">
                         <h3>烹饪步骤</h3>
@@ -127,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('export-txt').addEventListener('click', exportRecipeAsTxt);
             document.getElementById('export-dish-png').addEventListener('click', exportDishImage);
             document.getElementById('export-steps-zip').addEventListener('click', exportStepsAsZip);
+            document.getElementById('export-pdf').addEventListener('click', exportRecipeAsPDF);
             
         } catch (err) {
             alert('生成失败: ' + err.message);
@@ -309,6 +349,63 @@ function createStepsZip() {
         });
     } catch (err) {
         alert('导出失败: ' + err.message);
+        exportLoading.style.display = 'none';
+    }
+}
+
+async function exportRecipeAsPDF() {
+    const recipeContentEl = document.querySelector('.recipe-content');
+    if (!recipeContentEl) {
+        alert('未找到菜谱内容');
+        return;
+    }
+
+    // 显示加载提示
+    const exportLoading = document.getElementById('export-loading');
+    const exportMessage = document.getElementById('export-message');
+    exportMessage.textContent = '正在生成PDF，请稍候...';
+    exportLoading.style.display = 'flex';
+
+    try {
+        // 使用 html2canvas 将整个菜谱内容转为 canvas
+        const canvas = await html2canvas(recipeContentEl, {
+            scale: 2, // 提高清晰度
+            useCORS: true // 如果有跨域图片需要设置
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps = {
+            width: canvas.width,
+            height: canvas.height
+        };
+
+        // 计算图片在 A4 纸上的比例缩放
+        const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        const imgWidth = pageWidth;
+        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+        let position = 0;
+
+        // 多页处理
+        let remainingHeight = imgHeight;
+        while (remainingHeight > 0) {
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            remainingHeight -= pageHeight;
+
+            if (remainingHeight > 0) {
+                pdf.addPage();
+                position = - (imgHeight - remainingHeight);
+            }
+        }
+
+        // 下载PDF
+        pdf.save(`${currentRecipeData?.recipe?.name || '菜谱'}.pdf`);
+    } catch (err) {
+        alert('导出PDF失败: ' + err.message);
+    } finally {
         exportLoading.style.display = 'none';
     }
 }
