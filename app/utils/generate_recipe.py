@@ -4,6 +4,8 @@ import json
 import re
 
 def generate_recipe(ingredients, cuisine_type):
+    """食谱"""
+
     prompt = f"""
     请根据以下食材和烹饪风格生成详细的菜谱，严格遵守以下要求：
     1. 输出必须是纯净的JSON对象，禁止包含任何其他文本、注释、XML/HTML标签或Markdown代码块
@@ -29,29 +31,26 @@ def generate_recipe(ingredients, cuisine_type):
     }}"""
 
     client = OpenAI(
-        api_key="sk-W0rpStc95T7JVYVwDYc29IyirjtpPPby6SozFMQr17m8KWeo",
-        base_url="https://api.suanli.cn/v1",
+        api_key="sk-b8e09876066e40aab6ee92ba4a12629b",
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
     
-    try:
-        response = client.chat.completions.create(
-            model="free:Qwen3-30B-A3B",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        raw_content = response.choices[0].message.content
-        
-        # 清理响应内容
-        cleaned_content = raw_content.strip()
-        cleaned_content = re.sub(r'<think>.*?</think>', '', cleaned_content, flags=re.DOTALL)
-        cleaned_content = cleaned_content.replace('```json', '').replace('```', '').strip()
-        
-        # 提取JSON部分
-        json_match = re.search(r'\{.*\}', cleaned_content, re.DOTALL)
-        if not json_match:
-            raise ValueError("API响应中未找到有效JSON内容")
-        
-        return json.loads(json_match.group())
-        
-    except json.JSONDecodeError as e:
-        print("JSON解析失败，清理后的内容：", cleaned_content)
-        raise ValueError("API返回的内容不符合JSON格式") from e
+    completion = client.chat.completions.create(
+        model="qwen-plus", 
+        messages=[
+            {'role': 'system', 'content': 'You are a very skilled chef.'},
+            {'role': 'user', 'content': prompt}
+            ]
+    )
+    json_content = json.loads(completion.choices[0].message.content)
+
+    return json_content
+
+if __name__ == "__main__":
+    ingredients = "鸭腿，洋葱，米饭，牛排，西兰花"
+    cuisine_type = "中式粤菜"
+    print(generate_recipe(
+        ingredients=ingredients,
+        cuisine_type=cuisine_type
+    ))
+

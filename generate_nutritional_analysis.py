@@ -1,36 +1,41 @@
 import openai
-from openai import OpenAI  # 明确导入OpenAI类
+from openai import OpenAI
 import json
-import re
 
-
-def generate_image_description(recipe):
-    """生成菜品外貌描述"""
+def generate_nutrition_analysis(recipe):
+    """生成菜谱营养分析"""
     
     prompt = f"""
-        你是一个专业美食摄影师，需要根据以下菜谱生成菜品外观的详细描述。
+        你是一个专业营养师，需要根据以下菜谱生成详细的营养分析。
         请严格按照以下规则输出：
 
         ----- 规则 -----
         1. 输出必须是纯净的 JSON 对象，不要包含任何注释、Markdown、XML/HTML 或其他非 JSON 内容。
         2. JSON 必须包含以下字段：
-        - "style": 描述整体摆盘风格（如圆形、对称、现代极简）。
-        - "ingredients_visual": 基于菜谱中的食材列表，描述主要食材的视觉呈现方式（如颜色对比、分层效果）。
-        - "sauce_gloss": 酱汁或汤汁的光泽度（如镜面反光、哑光质地）。
-        - "photography_tips": 拍摄建议（如 45 度俯拍、逆光柔光）。
+        - "calories": 估算总卡路里（千卡）
+        - "protein": 蛋白质含量（克）
+        - "fat": 脂肪含量（克）
+        - "carbohydrates": 碳水化合物含量（克）
+        - "dietary_fiber": 膳食纤维含量（克）可选，如果无法计算可以省略
+        - "key_nutrients": 一个数组，列出2-4种关键营养素（如维生素C、钙）及其含量和单位（如毫克、微克）和主要来源食材
         3. 必须基于菜谱的以下信息生成内容：
         - 菜谱名称：{recipe['name']}
         - 使用食材：{', '.join([f"{ing['name']}（{ing['quantity']}）" for ing in recipe['ingredients']])}
-        - 关键步骤：{recipe['steps'][0]['description']}（第一步）, {recipe['steps'][-1]['description']}（最后一步）
-        - 总烹饪时间：{recipe['total_time']}（影响菜品完成状态）
+        - 烹饪方法：{recipe['steps'][0]['description']}（第一步）, {recipe['steps'][-1]['description']}（最后一步）
+        - 份量信息：根据食材总量合理估算
 
         ----- 示例 -----
         正确输出格式示例：
         {{
-            "style": "现代极简主义摆盘，中央主食材堆叠，周围留白",
-            "ingredients_visual": "鲜红番茄片与嫩黄炒蛋形成色彩对比，葱花点缀",
-            "sauce_gloss": "金黄色蛋液包裹食材，呈现丝绸般光泽",
-            "photography_tips": "建议使用 45 度俯拍，搭配侧逆光突出层次感"
+            "calories": 450,
+            "protein": 18,
+            "fat": 15,
+            "carbohydrates": 60,
+            "dietary_fiber": 5,
+            "key_nutrients": [
+                {{"nutrient": "维生素C", "amount": 25, "unit": "毫克", "source": "番茄"}},
+                {{"nutrient": "钙", "amount": 200, "unit": "毫克", "source": "奶酪"}}
+            ]
         }}"""
     
     client = OpenAI(
@@ -41,7 +46,7 @@ def generate_image_description(recipe):
     response = client.chat.completions.create(
         model="free:Qwen3-30B-A3B",
         messages=[
-            {"role": "system", "content": "你是一个专业摄影师，输出必须是纯净的 JSON 对象，不要任何额外文本"},
+            {"role": "system", "content": "你是一个专业营养师，输出必须是纯净的 JSON 对象，不要任何额外文本"},
             {"role": "user", "content": prompt}
         ],
         response_format={"type": "json_object"}  # 强制 JSON 格式
@@ -49,8 +54,6 @@ def generate_image_description(recipe):
     json_content = json.loads(response.choices[0].message.content)
     
     return json_content
-
-
 
 if __name__ == "__main__":
     recipe_example = {
@@ -75,8 +78,8 @@ if __name__ == "__main__":
     }
 
     try:
-        description = generate_image_description(recipe_example)
-        print("生成的菜品描述:")
-        print(description)
+        nutrition = generate_nutrition_analysis(recipe_example)
+        print("生成的营养分析:")
+        print(json.dumps(nutrition, indent=2, ensure_ascii=False))
     except Exception as e:
         print(f"调用失败: {e}")

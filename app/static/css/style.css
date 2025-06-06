@@ -302,3 +302,107 @@ select:focus {
     border-radius: 12px;
     box-shadow: 0 2px 15px rgba(0,0,0,0.1);
 }
+
+/* 新增样式 */
+.dish-image-container {
+    max-width: 600px;
+    margin: 1.5rem auto;
+    text-align: center;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.dish-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    display: block;
+}
+
+.dish-description {
+    padding: 1rem;
+    background: #f8f9fa;
+    font-style: italic;
+    color: #555;
+    border-top: 1px solid #eee;
+    margin: 0;
+}
+
+.step-image-container {
+    margin: 0.5rem 0 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 500px;
+}
+
+.step-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    display: block;
+}
+
+/* 调整步骤项样式 */
+.step-item {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed #eee;
+    margin-bottom: 1.5rem;
+}
+
+.step-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .dish-image-container {
+        max-width: 100%;
+        margin: 1rem auto;
+    }
+    
+    .step-image-container {
+        max-width: 100%;
+    }
+}
+/* 在原有样式基础上添加导出按钮样式 */
+.export-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.export-btn {
+    padding: 0.8rem 1.5rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.export-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.export-btn:active {
+    transform: translateY(0);
+}
+
+/* 提高导出图片的质量 */
+.recipe-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
