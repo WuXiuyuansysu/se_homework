@@ -1,12 +1,124 @@
 // 存储菜谱数据的全局变量
 let currentRecipeData = null;
 
+// 新增：构建菜谱HTML的函数
+function buildRecipeHTML(data) {
+    return `
+        <button id="favorite-btn" class="favorite-btn">收藏</button>
+        <div class="export-buttons">
+            <button class="export-btn" id="export-txt">📝 导出为TXT</button>
+            <button class="export-btn" id="export-dish-png">🖼️ 导出主菜图片</button>
+            <button class="export-btn" id="export-steps-zip">📚 导出步骤图片包</button>
+            <button class="export-btn" id="export-pdf">📄 导出为PDF</button>
+        </div>
+        <div class="recipe-content">
+            <div class="recipe-header">
+                <h2>${data.recipe.name}</h2>
+                
+                <!-- 菜品图片展示 -->
+                <div class="dish-image-container">
+                    <img src="data:image/png;base64,${data.dish_image}" 
+                        alt="${data.recipe.name}" 
+                        class="dish-image">
+                    <p class="dish-description">${data.dish_description}</p>
+                </div>
+                
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-icon">⏱</span>
+                        <span>总时长：${data.recipe.total_time}</span>
+                    </div>
+                    <!-- 新增热量元数据 -->
+                    <div class="meta-item">
+                        <span class="meta-icon">🔥</span>
+                        <span>热量：${data.nutrition.calories || 'N/A'}大卡</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增营养分析部分 -->
+            <div class="section nutrition-section">
+                <h3>营养分析</h3>
+                <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                        <span class="nutrition-label">蛋白质</span>
+                        <span class="nutrition-value">${data.nutrition.protein || 'N/A'}g</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-label">脂肪</span>
+                        <span class="nutrition-value">${data.nutrition.fat || 'N/A'}g</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-label">碳水化合物</span>
+                        <span class="nutrition-value">${data.nutrition.carbohydrates || 'N/A'}g</span>
+                    </div>
+                </div>
+                
+                <div class="nutrition-details">
+                    <h4>关键营养素</h4>
+                    <ul class="nutrients-list">
+                        ${(data.nutrition.key_nutrients || []).map(nutrient => `
+                            <li class="nutrient-item">
+                                <strong>${nutrient.nutrient}:</strong> 
+                                ${nutrient.amount}${nutrient.unit}
+                                <span class="nutrient-source">(来源: ${nutrient.source})</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>所需材料</h3>
+                <div class="ingredient-grid">
+                    ${data.recipe.ingredients.map(i => `
+                        <div class="ingredient-card">
+                            <strong>${i.name}</strong>
+                            <div>${i.quantity}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>烹饪步骤</h3>
+                <ol class="step-list">
+                    ${data.recipe.steps.map((s, index) => `
+                        <li class="step-item">
+                            <!-- 步骤图片 -->
+                            ${data.steps_images[index] ? `
+                                <div class="step-image-container">
+                                    <img src="data:image/png;base64,${data.steps_images[index]}" 
+                                         alt="步骤 ${index + 1}" 
+                                         class="step-image">
+                                </div>
+                            ` : ''}
+                            
+                            ${s.description}
+                            <span class="step-duration">${s.duration}</span>
+                        </li>
+                    `).join('')}
+                </ol>
+            </div>
+        </div>
+    `;
+}
+
 // 当DOM加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
     // 烹饪风格选择框和输入框的切换逻辑
     const selectEl = document.getElementById('cuisine_type_select');
     const inputEl = document.getElementById('cuisine_type_input');
     const hiddenEl = document.getElementById('cuisine_type');
+
+    // 新增：页面加载时检查URL参数并加载菜谱
+    const urlParams = new URLSearchParams(window.location.search);
+    const recipeType = urlParams.get('type');
+    const filename = urlParams.get('filename');
+    
+    if (recipeType && filename) {
+        loadRecipe(recipeType, filename);
+    }
     
     // 当选择下拉选项时
     selectEl.addEventListener('change', function() {
@@ -41,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const loading = document.getElementById('loading');
         const resultContainer = document.getElementById('result-container');
         
+        
         try {
             // 显示加载动画
             loading.style.display = 'flex';
@@ -59,115 +172,17 @@ document.addEventListener('DOMContentLoaded', function() {
             currentRecipeData = data;
 
             // 构建结果HTML（添加导出按钮区域）
-            const html = `
-                <div class="export-buttons">
-                    <button class="export-btn" id="export-txt">📝 导出为TXT</button>
-                    <button class="export-btn" id="export-dish-png">🖼️ 导出主菜图片</button>
-                    <button class="export-btn" id="export-steps-zip">📚 导出步骤图片包</button>
-                    <button class="export-btn" id="export-pdf">📄 导出为PDF</button>
-                </div>
-                <div class="recipe-content">
-                    <div class="recipe-header">
-                        <h2>${data.recipe.name}</h2>
-                        
-                        <!-- 菜品图片展示 -->
-                        <div class="dish-image-container">
-                            <img src="data:image/png;base64,${data.dish_image}" 
-                                alt="${data.recipe.name}" 
-                                class="dish-image">
-                            <p class="dish-description">${data.dish_description}</p>
-                        </div>
-                        
-                        <div class="recipe-meta">
-                            <div class="meta-item">
-                                <span class="meta-icon">⏱</span>
-                                <span>总时长：${data.recipe.total_time}</span>
-                            </div>
-                            <!-- 新增热量元数据 -->
-                            <div class="meta-item">
-                                <span class="meta-icon">🔥</span>
-                                <span>热量：${data.nutrition.calories || 'N/A'}大卡</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 新增营养分析部分 -->
-                    <div class="section nutrition-section">
-                        <h3>营养分析</h3>
-                        <div class="nutrition-grid">
-                            <div class="nutrition-item">
-                                <span class="nutrition-label">蛋白质</span>
-                                <span class="nutrition-value">${data.nutrition.protein || 'N/A'}g</span>
-                            </div>
-                            <div class="nutrition-item">
-                                <span class="nutrition-label">脂肪</span>
-                                <span class="nutrition-value">${data.nutrition.fat || 'N/A'}g</span>
-                            </div>
-                            <div class="nutrition-item">
-                                <span class="nutrition-label">碳水化合物</span>
-                                <span class="nutrition-value">${data.nutrition.carbohydrates || 'N/A'}g</span>
-                            </div>
-                        </div>
-                        
-                        <div class="nutrition-details">
-                            <h4>关键营养素</h4>
-                            <ul class="nutrients-list">
-                                ${(data.nutrition.key_nutrients || []).map(nutrient => `
-                                    <li class="nutrient-item">
-                                        <strong>${nutrient.nutrient}:</strong> 
-                                        ${nutrient.amount}${nutrient.unit}
-                                        <span class="nutrient-source">(来源: ${nutrient.source})</span>
-                                    </li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h3>所需材料</h3>
-                        <div class="ingredient-grid">
-                            ${data.recipe.ingredients.map(i => `
-                                <div class="ingredient-card">
-                                    <strong>${i.name}</strong>
-                                    <div>${i.quantity}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-
-                    <div class="section">
-                        <h3>烹饪步骤</h3>
-                        <ol class="step-list">
-                            ${data.recipe.steps.map((s, index) => `
-                                <li class="step-item">
-                                    <!-- 步骤图片 -->
-                                    ${data.steps_images[index] ? `
-                                        <div class="step-image-container">
-                                            <img src="data:image/png;base64,${data.steps_images[index]}" 
-                                                 alt="步骤 ${index + 1}" 
-                                                 class="step-image">
-                                        </div>
-                                    ` : ''}
-                                    
-                                    ${s.description}
-                                    <span class="step-duration">${s.duration}</span>
-                                </li>
-                            `).join('')}
-                        </ol>
-                    </div>
-                </div>
-            `;
+            const html = buildRecipeHTML(data);
 
             resultContainer.innerHTML = html;
             resultContainer.style.display = 'block';
             
             // 添加导出功能的事件监听
+            bindFavoriteButton(recipeData);
             document.getElementById('export-txt').addEventListener('click', exportRecipeAsTxt);
             document.getElementById('export-dish-png').addEventListener('click', exportDishImage);
             document.getElementById('export-steps-zip').addEventListener('click', exportStepsAsZip);
             document.getElementById('export-pdf').addEventListener('click', exportRecipeAsPDF);
-            
         } catch (err) {
             alert('生成失败: ' + err.message);
         } finally {
@@ -408,4 +423,68 @@ async function exportRecipeAsPDF() {
     } finally {
         exportLoading.style.display = 'none';
     }
+}
+
+// 新增：加载已保存的菜谱
+async function loadRecipe(type, filename) {
+    const loading = document.getElementById('loading');
+    const resultContainer = document.getElementById('result-container');
+    
+    try {
+        loading.style.display = 'flex';
+        resultContainer.style.display = 'none';
+        
+        const response = await fetch(`/load_recipe?type=${type}&filename=${filename}`);
+        const data = await response.json();
+        
+        if (data.error) throw new Error(data.error);
+        
+        
+        // 构建结果HTML
+        const html = buildRecipeHTML(data);
+        
+        resultContainer.innerHTML = html;
+        resultContainer.style.display = 'block';
+        // 添加导出功能的事件监听
+        bindFavoriteButton(data.recipe);
+        document.getElementById('export-txt').addEventListener('click', exportRecipeAsTxt);
+        document.getElementById('export-dish-png').addEventListener('click', exportDishImage);
+        document.getElementById('export-steps-zip').addEventListener('click', exportStepsAsZip);
+        document.getElementById('export-pdf').addEventListener('click', exportRecipeAsPDF);
+        
+    } catch (err) {
+        alert('加载菜谱失败: ' + err.message);
+    } finally {
+        loading.style.display = 'none';
+    }
+}
+
+// 收藏按钮事件绑定
+function bindFavoriteButton(recipeData) {
+    const btn = document.getElementById('favorite-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        btn.disabled = true;
+        fetch('/favorite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(recipeData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                btn.textContent = '已收藏';
+                btn.classList.add('saved');
+            } else {
+                btn.textContent = '收藏失败';
+                btn.disabled = false;
+            }
+        })
+        .catch(() => {
+            btn.textContent = '收藏失败';
+            btn.disabled = false;
+        });
+    });
 }
