@@ -4,10 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能菜谱生成器</title>
-    <link rel="stylesheet" href="./static/css/style.css">
+    <link rel="stylesheet" href="./static/css/index.css">
     <script src="./static/js/JSZip.js"></script>
+    <script src="./static/js/jspdf.js"></script>
+    <script src="./static/js/html2canvas.js"></script>
+    <script src="./static/js/index.js"></script>
 </head>
 <body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-logo">美食生成器</a>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">首页</a>
+                <a href="{{ url_for('profile') }}" class="active">个人中心</a>
+                <a href="/logout">退出</a>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <header class="header">
             <h1>智能菜谱生成器</h1>
@@ -32,7 +45,7 @@
                     <select id="cuisine_type_select" class="select-input">
                         <option value="">-- 快速选择 --</option>
                         <option value="西式">西式料理</option>
-                        <option value="红烧">中式红烧</option>
+                        <option value="红烧">中式料理</option>
                         <option value="清蒸">清蒸</option>
                         <option value="川菜">川味麻辣</option>
                         <option value="日式">和风料理</option>
@@ -69,8 +82,6 @@
             <p>Tips: 支持常见肉类、海鲜、蔬菜组合，建议输入3-5种主要食材</p>
         </footer>
     </div>
-
-    <!-- 引入外部JavaScript文件 -->
-    <script src="./static/js/script.js"></script>
+    <div id="recipe-loader" style="display: none;"></div>
 </body>
 </html>

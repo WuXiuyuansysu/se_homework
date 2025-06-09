@@ -1,0 +1,19 @@
+@startuml state
+[*] --> Idle
+
+state Idle
+state "Processing" as processing {
+  state "生成菜谱" as gen_recipe
+  state "生成步骤图" as gen_steps
+  state "生成成品图" as gen_dish
+}
+
+Idle --> gen_recipe : 收到请求
+gen_recipe --> gen_steps : 菜谱生成成功
+gen_steps --> gen_dish : 步骤图生成成功
+gen_dish --> Idle : 成品图生成完成
+
+gen_recipe --> [*] : 生成失败
+gen_steps --> [*] : 生成失败
+gen_dish --> [*] : 生成失败
+@enduml
