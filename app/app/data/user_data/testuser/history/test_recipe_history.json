@@ -1,0 +1,19 @@
+{
+    "name": "番茄炒蛋",
+    "recipe": [
+        "番茄",
+        "鸡蛋",
+        "盐",
+        "油"
+    ],
+    "steps_imgs": [
+        "step1.png",
+        "step2.png"
+    ],
+    "total_img": "total_dish.png",
+    "dish_nutrition": {
+        "calories": 200,
+        "protein": 10,
+        "fat": 5
+    }
+}
