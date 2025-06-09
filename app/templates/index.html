@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能菜谱生成器</title>
     <link rel="stylesheet" href="./static/css/style.css">
+    <script src="./static/js/JSZip.js"></script>
+    <script src="./static/js/jspdf.js"></script>
+    <script src="./static/js/html2canvas.js"></script>
+    <script src="./static/js/script.js"></script>
 </head>
 <body>
     <div class="container">
@@ -31,7 +35,7 @@
                     <select id="cuisine_type_select" class="select-input">
                         <option value="">-- 快速选择 --</option>
                         <option value="西式">西式料理</option>
-                        <option value="红烧">中式红烧</option>
+                        <option value="红烧">中式料理</option>
                         <option value="清蒸">清蒸</option>
                         <option value="川菜">川味麻辣</option>
                         <option value="日式">和风料理</option>
@@ -57,111 +61,16 @@
             <div class="loader"></div>
             <p>AI正在生成菜谱中，请稍候...</p>
         </div>
+        
+        <!-- 添加导出加载提示 -->
+        <div id="export-loading" class="loading-overlay" style="display: none; background: rgba(255,255,255,0.8);">
+            <div class="loader"></div>
+            <p id="export-message">正在处理图片，请稍候...</p>
+        </div>
 
         <footer class="footer">
             <p>Tips: 支持常见肉类、海鲜、蔬菜组合，建议输入3-5种主要食材</p>
         </footer>
     </div>
-
-
-    <script>
-        document.querySelector('form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const loading = document.getElementById('loading');
-            const resultContainer = document.getElementById('result-container');
-            
-            try {
-                // 显示加载动画
-                loading.style.display = 'flex';
-                resultContainer.style.display = 'none';
-
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.error) throw new Error(data.error);
-
-                // 构建结果HTML
-                const html = `
-                    <div class="recipe-header">
-                        <h2>${data.name}</h2>
-                        <div class="recipe-meta">
-                            <div class="meta-item">
-                                <span class="meta-icon">⏱</span>
-                                <span>总时长：${data.total_time}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h3>所需材料</h3>
-                        <div class="ingredient-grid">
-                            ${data.ingredients.map(i => `
-                                <div class="ingredient-card">
-                                    <strong>${i.name}</strong>
-                                    <div>${i.quantity}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h3>烹饪步骤</h3>
-                        <ol class="step-list">
-                            ${data.steps.map(s => `
-                                <li class="step-item">
-                                    ${s.description}
-                                    <span class="step-duration">${s.duration}</span>
-                                </li>
-                            `).join('')}
-                        </ol>
-                    </div>
-                `;
-
-                resultContainer.innerHTML = html;
-                resultContainer.style.display = 'block';
-                
-            } catch (err) {
-                alert('生成失败: ' + err.message);
-            } finally {
-                loading.style.display = 'none';
-            }
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectEl = document.getElementById('cuisine_type_select');
-            const inputEl = document.getElementById('cuisine_type_input');
-            const hiddenEl = document.getElementById('cuisine_type');
-            
-            // 当选择下拉选项时
-            selectEl.addEventListener('change', function() {
-                if(this.value) {
-                    inputEl.value = '';
-                    hiddenEl.value = this.value;
-                }
-            });
-            
-            // 当输入自定义内容时
-            inputEl.addEventListener('input', function() {
-                if(this.value) {
-                    selectEl.value = '';
-                    hiddenEl.value = this.value;
-                }
-            });
-            
-            // 表单提交验证
-            document.querySelector('form').addEventListener('submit', function(e) {
-                if(!hiddenEl.value) {
-                    e.preventDefault();
-                    alert('请选择或输入烹饪风格');
-                    inputEl.focus();
-                }
-            });
-        });
-    </script>
 </body>
 </html>

@@ -47,3 +47,4 @@ if __name__ == "__main__":
     }
 
     dish_image = generate_dish_image(test_description)
+
