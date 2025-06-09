@@ -7,6 +7,10 @@ from utils.generate_nutritional_analysis import generate_nutrition_analysis
 from utils.class_login import login
 from PIL import Image
 import os
+from classes.RecipeGenerationPipeline import RecipeGenerationPipeline
+
+
+
 import base64
 from io import BytesIO
 
@@ -64,40 +68,10 @@ def generate():
         
     ingredients = request.form.get('ingredients')
     cuisine_type = request.form.get('cuisine_type')
-    
-    try:
-        recipe = generate_recipe(
-            ingredients=ingredients,
-            cuisine_type=cuisine_type
-        )
-        
-        # 生成菜品外貌描述
-        appearance_desc = generate_image_description(recipe)
-        img = generate_dish_image(appearance_desc)
-        # 将图片转换为base64编码
-        buffered = BytesIO()
-        img.save(buffered, format="PNG")
-        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-        
-        dish_nutrition=generate_nutrition_analysis(recipe)
-        # 生成每个步骤的图片描述
-        step_imgs = generate_steps_image(recipe)
-        
-        step_base64 = []
-        for image in step_imgs:
-            buffered = BytesIO()
-            image.save(buffered, format="PNG")
-            step_base64.append(base64.b64encode(buffered.getvalue()).decode('utf-8'))
 
-        # 返回组合数据
-        return jsonify({
-            "recipe": recipe,
-            "steps_images": step_base64,
-            "dish_image": img_base64, 
-            "nutrition": dish_nutrition 
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    pipline = RecipeGenerationPipeline(ingredients, cuisine_type)
+    result = pipline.execute()
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
