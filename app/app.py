@@ -1,9 +1,13 @@
 from encodings import johab
 from flask import Flask, render_template, request, jsonify
+
 from PIL import Image
 import requests
 import os
 from classes.RecipeGenerationPipeline import RecipeGenerationPipeline
+
+
+
 import base64
 from io import BytesIO
 
@@ -16,6 +20,7 @@ def index():
 def generate():
     ingredients = request.form.get('ingredients')
     cuisine_type = request.form.get('cuisine_type')
+
     pipline = RecipeGenerationPipeline(ingredients, cuisine_type)
     result = pipline.execute()
     return jsonify(result)

@@ -1,3 +1,4 @@
+
 from classes.RecipeGenerationPipeline import RecipeGenerationPipeline
 if __name__ == "__main__":
     ingredients = "面条，大便，牛肉，猪肉，木耳"
@@ -5,4 +6,5 @@ if __name__ == "__main__":
 
     pipline = RecipeGenerationPipeline(ingredients, cuisine_type)
     result = pipline.execute()
+
 
