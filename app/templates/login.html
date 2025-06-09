@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食生成器 - 登录</title>
+    <link rel="stylesheet" href="./static/css/login.css">
+    <script src="./static/js/login.js"></script>
+</head>
+<body>
+    <div class="login-container">
+        <h1>美食生成器</h1>
+        <div class="form-container">
+            <div id="login-form" class="form active">
+                <h2>登录</h2>
+                <div class="form-group">
+                    <label for="login-username">用户名</label>
+                    <input type="text" id="login-username" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">密码</label>
+                    <input type="password" id="login-password" placeholder="请输入密码">
+                </div>
+                <button id="login-btn">登录</button>
+                <p class="switch-form">没有账号？<a href="#" id="show-register">立即注册</a></p>
+            </div>
+            
+            <div id="register-form" class="form">
+                <h2>注册</h2>
+                <div class="form-group">
+                    <label for="register-username">用户名</label>
+                    <input type="text" id="register-username" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">密码</label>
+                    <input type="password" id="register-password" placeholder="请输入密码">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">确认密码</label>
+                    <input type="password" id="confirm-password" placeholder="请再次输入密码">
+                </div>
+                <button id="register-btn">注册</button>
+                <p class="switch-form">已有账号？<a href="#" id="show-login">立即登录</a></p>
+            </div>
+        </div>
+        
+        <div id="message" class="message"></div>
+    </div>
+    
+</body>
+</html>
