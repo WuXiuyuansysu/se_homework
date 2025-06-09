@@ -1,0 +1,30 @@
+@startuml user_case
+left to right direction 
+
+actor "User" as user 
+
+rectangle "AI菜谱生成系统" {
+  usecase "输入原料和菜系风格" as uc_input
+  usecase "生成菜谱" as uc_generate_recipe
+  usecase "查看生成菜谱" as uc_view_recipe
+  usecase "生成步骤图片" as uc_generate_steps_img
+  usecase "查看步骤图片" as uc_view_steps_img
+  usecase "生成成品图片" as uc_generate_dish_img
+  usecase "查看成品图片" as uc_view_dish_img
+
+  user --> uc_input
+  user --> uc_view_recipe
+  user --> uc_view_steps_img
+  user --> uc_view_dish_img
+
+
+  uc_generate_recipe .> uc_input : <<include>>
+  uc_generate_steps_img .> uc_generate_recipe : <<extend>>
+  uc_generate_dish_img .> uc_generate_recipe : <<extend>>
+  
+
+  uc_view_recipe .> uc_generate_recipe : <<extend>>
+  uc_view_steps_img .> uc_generate_steps_img : <<extend>>
+  uc_view_dish_img .> uc_generate_dish_img : <<extend>>
+}
+@enduml
