@@ -1,0 +1,41 @@
+@startuml sequence
+
+title AI 菜谱生成系统序列图
+actor User as user
+participant "app.py" as app
+participant "generate_recipe.py" as recipe_gen
+participant "generate_steps_image.py" as steps_img
+participant "generate_image_description.py" as desc_gen
+participant "generate_dish_image.py" as dish_img
+database "Pictures\n(1.png, 2.png...)" as pics
+
+user -> app : POST /generate\n(原料, 菜系风格)
+activate app
+
+app -> recipe_gen : generate_recipe(ingredients, cuisine_type)
+activate recipe_gen
+recipe_gen --> app : 菜谱JSON\n(名称,原料,步骤)
+deactivate recipe_gen
+
+app -> desc_gen : generate_image_description(recipe)
+activate desc_gen
+desc_gen --> app : 图片描述JSON
+deactivate desc_gen
+
+app -> steps_img : generate_steps_image(recipe)
+activate steps_img
+steps_img --> pics : 保存步骤图片\n(1.png, 2.png...)
+steps_img --> app : 步骤图片路径列表
+deactivate steps_img
+
+app -> dish_img : generate_dish_image(description)
+activate dish_img
+dish_img --> pics : 保存成品图片\n(dish_image.png)
+dish_img --> app : 成品图片路径
+deactivate dish_img
+
+app --> user : 返回响应\n(菜谱+图片URL)
+deactivate app
+
+@enduml
+
