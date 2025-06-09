@@ -1,6 +1,6 @@
 #Env Require:
 dot - graphviz version 2.43.0 (0) # 用于UML生成，非必须
-
+java "-Dfile.encoding=UTF-8"
 #Python Require:
 # Name                    Version                   Build  Channel
 _libgcc_mutex             0.1                        main  

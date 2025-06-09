@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 美食生成器</title>
+    <link rel="stylesheet" href="./static/css/profile.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>美食生成器</h1>
+            <div class="user-info">
+                <span>欢迎, {{ username }}</span>
+                <button class="home-btn" onclick="location.href='/'">回到首页</button>
+                <button class="logout-btn" onclick="location.href='/logout'">退出登录</button>
+            </div>
+        </div>
+
+        <div class="sections">
+            <div class="section">
+                <h2>我的收藏</h2>
+                {% if likes %}
+                <ul class="recipe-list">
+                    {% for recipe in likes %}
+                    <li class="recipe-item">
+                        <a href="{{ url_for('index') }}?type=likes&filename={{ recipe.filename }}">
+                            {{ recipe.data.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-message">暂无收藏的菜谱</div>
+                {% endif %}
+            </div>
+
+            <div class="section">
+                <h2>历史记录</h2>
+                {% if history %}
+                <ul class="recipe-list">
+                    {% for recipe in history %}
+                    <li class="recipe-item">
+                        <a href="{{ url_for('index') }}?type=history&filename={{ recipe.filename }}">
+                            {{ recipe.data.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-message">暂无历史记录</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

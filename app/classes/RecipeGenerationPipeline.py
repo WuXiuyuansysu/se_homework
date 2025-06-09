@@ -3,8 +3,11 @@ from utils.generate_image_description import generate_image_description
 from utils.generate_dish_image import generate_dish_image
 from utils.generate_steps_image import generate_steps_image
 from utils.generate_nutritional_analysis import generate_nutrition_analysis
+from utils.generate_diagram import build_sequence
 import base64
 from io import BytesIO
+from classes.class_recipe import Recipe
+import json
 
 class RecipeGenerationPipeline:
     def __init__(self, ingredients, cuisine_type):
@@ -15,6 +18,8 @@ class RecipeGenerationPipeline:
         self.dish_image = None
         self.nutrition = None
         self.step_images = None
+        self.name = None
+        self.uml_sequence = None
     
     def execute(self):
         """执行完整的菜谱生成流程"""
@@ -25,6 +30,11 @@ class RecipeGenerationPipeline:
             )
             print("recipe done")
 
+            self.name = self.recipe.get("name")
+            if not self.name:
+                self.name = "未知菜谱"
+                print("未能生成菜谱名称，使用默认名称 '未知菜谱'")
+
             self.appearance_desc = generate_image_description(self.recipe)
             print("appearance_desc done")
 
@@ -34,8 +44,12 @@ class RecipeGenerationPipeline:
             self.nutrition = generate_nutrition_analysis(self.recipe)
             print("nutrition done")
 
+            self.uml_sequence = build_sequence(self.recipe)
+            print("uml done")
+
             self.step_images = generate_steps_image(self.recipe)
             print("step_image done")
+
 
             return self.format_response()
         except Exception as e:
@@ -46,13 +60,16 @@ class RecipeGenerationPipeline:
 
         dish_base64 = self.image_to_base64(self.dish_image)
         step_base64 = [self.image_to_base64(img) for img in self.step_images]
-        
-        return {
-            "recipe": self.recipe,
-            "steps_images": step_base64,
-            "dish_image": dish_base64, 
-            "nutrition": self.nutrition 
-        }
+        uml_base64 = self.image_to_base64(self.uml_sequence)
+
+        return Recipe(
+            name=self.name,
+            recipe=self.recipe,
+            steps_imgs=step_base64,
+            total_img=dish_base64, 
+            dish_nutrition=self.nutrition,
+            uml_sequence=uml_base64
+        )
     
     @staticmethod
     def image_to_base64(image):

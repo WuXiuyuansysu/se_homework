@@ -37,7 +37,7 @@ def generate_diagrams():
         
         # 执行PlantUML命令
         cmd = [
-            "java", "-jar", jar_path,
+            "java", "-Dfile.encoding=UTF-8", "-jar", jar_path,
             f"-t{OUTPUT_FORMAT}",
             f"-o{os.path.abspath(OUTPUT_DIR)}",  # 使用绝对路径确保正确
             os.path.abspath(puml_file)  # 使用绝对路径
