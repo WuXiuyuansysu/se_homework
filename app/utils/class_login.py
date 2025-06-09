@@ -1,4 +1,4 @@
-from class_user import User
+from utils.class_user import User
 import json
 
 class login:

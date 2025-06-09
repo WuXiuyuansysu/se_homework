@@ -1,6 +1,6 @@
 import os
 import json
-import class_recipe
+from utils.class_recipe import load_recipe, Recipe
 
 class User:
     def __init__(self, username: str):
@@ -57,7 +57,7 @@ class User:
         if not os.path.exists(path):
             return None
         try:
-            return class_recipe.load_recipe(path)
+            return load_recipe(path)
         except Exception:
             return None
 
@@ -69,7 +69,7 @@ class User:
         if not os.path.exists(path):
             return None
         try:
-            return class_recipe.load_recipe(path)
+            return load_recipe(path)
         except Exception:
             return None
         
@@ -141,7 +141,7 @@ class User:
 
 #测试
 if __name__ == "__main__":
-    user = User("testuser")
+    user = User( "testuser")
     user.setup()
     print("User folder created:", user.filepath)
     print("Likes folder created:", os.path.join(user.filepath, "likes"))
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     print("User likes:", user.likes)
     print("User history:", user.history)
     # 测试保存和加载菜谱
-    recipe = class_recipe.Recipe(
+    recipe = Recipe(
         name="番茄炒蛋",
         recipe=["番茄", "鸡蛋", "盐", "油"],
         steps_imgs=["step1.png", "step2.png"],
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     print("User likes:", user.load_user_likes())
     print("User history:", user.load_user_history())
     # 测试加载菜谱
-    recipe = class_recipe.load_recipe('recipe_example.json')
+    recipe = load_recipe('recipe_example.json')
     print(recipe.to_dict())
     # 输出: {'name': '番茄炒蛋', 'recipe': [...], 'steps_imgs': [...], 'total_img': '...', 'dish_nutrition': {...}}
     user.setup()
