@@ -1,0 +1,29 @@
+@startuml class
+class App {
+  +Flask app
+  +route('/')
+  +route('/generate')
+}
+
+class RecipeGenerator {
+  +generate_recipe()
+}
+
+class ImageGenerator {
+  +generate_dish_image()
+  +generate_steps_image()
+}
+
+class DescriptionGenerator {
+  +generate_image_description()
+}
+
+App --> RecipeGenerator : 使用
+App --> ImageGenerator : 使用
+App --> DescriptionGenerator : 使用
+
+note right of ImageGenerator
+  负责生成步骤图片(1.png...)
+  和成品图片(dish_image.png)
+end note
+@enduml
