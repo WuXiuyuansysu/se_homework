@@ -4,13 +4,14 @@ from utils.generate_dish_image import generate_dish_image
 from utils.generate_steps_image import generate_steps_image
 from utils.generate_nutritional_analysis import generate_nutrition_analysis
 from utils.generate_diagram import build_sequence
+from utils.generate_prefer_recipe import generate_prefer_recipe
 import base64
 from io import BytesIO
 from classes.class_recipe import Recipe
 import json
 
 class RecipeGenerationPipeline:
-    def __init__(self, ingredients, cuisine_type):
+    def __init__(self, ingredients, cuisine_type,preferences=None):
         self.ingredients = ingredients
         self.cuisine_type = cuisine_type
         self.recipe = None
@@ -20,15 +21,23 @@ class RecipeGenerationPipeline:
         self.step_images = None
         self.name = None
         self.uml_sequence = None
+        self.preferences=preferences
     
     def execute(self):
         """执行完整的菜谱生成流程"""
         try:
-            self.recipe = generate_recipe(
-                ingredients=self.ingredients,
-                cuisine_type=self.cuisine_type
-            )
-            print("recipe done")
+            if self.preferences==None:
+                self.recipe = generate_recipe(
+                    ingredients=self.ingredients,
+                    cuisine_type=self.cuisine_type
+                )
+                print("recipe done")
+            else :
+                self.recipe = generate_prefer_recipe(
+                    ingredients=self.ingredients,
+                    cuisine_type=self.cuisine_type
+                )
+                print("recipe done")
 
             self.name = self.recipe.get("name")
             if not self.name:
