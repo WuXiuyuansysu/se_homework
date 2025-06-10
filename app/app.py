@@ -71,21 +71,26 @@ def generate():
 
     pipline = RecipeGenerationPipeline(ingredients, cuisine_type)
     result = pipline.execute()
+        
 
     #保存历史记录
-    user = login_manager.User
+    user = User(session['username'])
     trans_data = {
         "name": result.name,
         "recipe": result.recipe,
-        "steps_imgs": result.steps_imgs,
-        "total_img": result.total_img,
-        "nutrition": result.dish_nutrition
+        "steps_images": result.steps_imgs,
+        "dish_image": result.total_img,
+        "nutrition": result.dish_nutrition,
+        "uml_sequence": result.uml_sequence
     }
     if user:
         user.save_recipe_to_history(result)
+    else:
+        return jsonify({"error": "用户不存在"}), 404
     
     return jsonify(trans_data)
 
+# 用户个人资料页面
 @app.route('/profile')
 def profile():
     if 'username' not in session:
@@ -97,7 +102,6 @@ def profile():
     # 获取收藏和历史记录的菜谱列表
     likes_recipes = user.load_user_likes()
     history_recipes = user.load_user_history()
-    print(f"Likes: {likes_recipes}, History: {history_recipes}")
     
     return render_template(
         'profile.html', 
@@ -106,6 +110,7 @@ def profile():
         history=history_recipes
     )
 
+# 加载菜谱
 @app.route('/load_recipe', methods=['GET'])
 def load_recipe():
     if 'username' not in session:
@@ -137,8 +142,10 @@ def load_recipe():
         "dish_image": recipe.total_img,
         "steps_images": recipe.steps_imgs,
         "nutrition": recipe.dish_nutrition,
+        "uml_sequence": recipe.uml_sequence,
     })
 
+# 收藏菜谱
 @app.route('/favorite', methods=['POST'])
 def favorite():
     if 'username' not in session:
@@ -157,6 +164,40 @@ def favorite():
         return jsonify({'success': True})
     except Exception as e:
         print(f"Error saving recipe to favorites: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+    
+# 删除菜谱
+@app.route('/delete_recipe', methods=['POST'])
+def delete_recipe():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': '未登录'}), 401
+    username = session['username']
+    user = User(username)
+    data = request.get_json()
+    recipe_type = data.get('type')
+    filename = data.get('filename')
+    try:
+        if recipe_type == 'likes':
+            user.delete_recipe_from_likes(filename)
+        elif recipe_type == 'history':
+            user.delete_recipe_from_history(filename)
+        else:
+            return jsonify({'success': False, 'message': '类型错误'})
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+# 清除历史记录
+@app.route('/clear_history', methods=['POST'])
+def clear_history():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': '未登录'}), 401
+    username = session['username']
+    user = User(username)
+    try:
+        user.clear_history()
+        return jsonify({'success': True})
+    except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
 if __name__ == '__main__':

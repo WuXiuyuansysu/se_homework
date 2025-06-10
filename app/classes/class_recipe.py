@@ -10,6 +10,7 @@ class Recipe:
         self.steps_imgs = steps_imgs 
         self.total_img = total_img
         self.dish_nutrition = dish_nutrition
+        self.uml_sequence = uml_sequence
 
 
     #转化为字典格式
@@ -37,10 +38,12 @@ def load_recipe(file_path):
         steps_imgs = data.get('steps_imgs', [])
         total_img = data.get('total_img')
         dish_nutrition = data.get('dish_nutrition', {})
+        uml_sequence = data.get('uml_sequence', None)
+
         if not name or not recipe or not total_img:
             print(f"文件 {file_path} 数据不完整")
             raise ValueError("食谱数据不完整")
-        return Recipe(name, recipe, steps_imgs, total_img, dish_nutrition)
+        return Recipe(name, recipe, steps_imgs, total_img, dish_nutrition, uml_sequence)
     
 #测试
 if __name__ == "__main__":
