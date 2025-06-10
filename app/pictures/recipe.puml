@@ -1,0 +1,19 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+participant Chef
+participant Kitchen
+Chef -> Kitchen : 将鸡胸肉切成2厘米见方的块，用清水冲洗干净并沥干水分；西兰花切成小朵，芹菜切段，生姜切片，蒜拍碎备用。
+return 5分钟
+Chef -> Kitchen : 锅中加入清水，放入鸡胸肉块焯水，煮至表面变色后捞出，沥干备用。
+return 3分钟
+Chef -> Kitchen : 热锅冷油，加入食用油，放入姜片和蒜末爆香。
+return 2分钟
+Chef -> Kitchen : 加入焯过水的鸡胸肉翻炒约1分钟，随后加入料酒、酱油、老抽和糖继续翻炒均匀。
+return 3分钟
+Chef -> Kitchen : 加入清水，水量需没过鸡肉，大火煮开后转中小火焖煮10分钟。
+return 12分钟
+Chef -> Kitchen : 加入西兰花和芹菜段，翻拌均匀后继续焖煮5分钟，直至蔬菜熟透。
+return 5分钟
+Chef -> Kitchen : 最后根据口味调整盐量，收汁至浓稠即可装盘。
+return 5分钟
+@enduml

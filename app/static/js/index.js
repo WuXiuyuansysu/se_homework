@@ -20,7 +20,6 @@ function buildRecipeHTML(data) {
                     <img src="data:image/png;base64,${data.dish_image}" 
                         alt="${data.recipe.name}" 
                         class="dish-image">
-                    <p class="dish-description">${data.dish_description}</p>
                 </div>
                 
                 <div class="recipe-meta">
@@ -79,7 +78,14 @@ function buildRecipeHTML(data) {
                     `).join('')}
                 </div>
             </div>
-
+            <div class="section">
+                <h3>流程图</h3>
+                ${data.uml_sequence ? `
+                    <div class="uml-image-container">
+                        <img src="data:image/png;base64,${data.uml_sequence}" alt="UML 流程图" class="uml-image">
+                    </div>
+                ` : '<div class="empty-message">暂无流程图</div>'}
+            </div>
             <div class="section">
                 <h3>烹饪步骤</h3>
                 <ol class="step-list">
@@ -178,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
             resultContainer.style.display = 'block';
             
             // 添加导出功能的事件监听
-            bindFavoriteButton(recipeData);
+            bindFavoriteButton(currentRecipeData.recipe);
             document.getElementById('export-txt').addEventListener('click', exportRecipeAsTxt);
             document.getElementById('export-dish-png').addEventListener('click', exportDishImage);
             document.getElementById('export-steps-zip').addEventListener('click', exportStepsAsZip);
