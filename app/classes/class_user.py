@@ -234,12 +234,13 @@ class User:
         """
         if prefer:
             filename = "prefer.json"
+            file_path = os.path.join(self.filepath, filename)
         else:
             filename = recipe.name+ ".json"
-        path = os.path.join(self.filepath, "history")
-        if not os.path.exists(path):
-            os.makedirs(path)
-        file_path = os.path.join(path, filename)
+            path = os.path.join(self.filepath, "history")
+            if not os.path.exists(path):
+                os.makedirs(path)
+            file_path = os.path.join(path, filename)
         try:
             with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(recipe.to_dict(), f, ensure_ascii=False, indent=4)
