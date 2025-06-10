@@ -3,6 +3,7 @@ from utils.generate_image_description import generate_image_description
 from utils.generate_dish_image import generate_dish_image
 from utils.generate_steps_image import generate_steps_image
 from utils.generate_nutritional_analysis import generate_nutrition_analysis
+from utils.generate_diagram import build_sequence
 import base64
 from io import BytesIO
 from classes.class_recipe import Recipe
@@ -18,6 +19,7 @@ class RecipeGenerationPipeline:
         self.nutrition = None
         self.step_images = None
         self.name = None
+        self.uml_sequence = None
     
     def execute(self):
         """执行完整的菜谱生成流程"""
@@ -42,6 +44,9 @@ class RecipeGenerationPipeline:
             self.nutrition = generate_nutrition_analysis(self.recipe)
             print("nutrition done")
 
+            self.uml_sequence = build_sequence(self.recipe)
+            print("uml done")
+
             self.step_images = generate_steps_image(self.recipe)
             print("step_image done")
 
@@ -55,13 +60,15 @@ class RecipeGenerationPipeline:
 
         dish_base64 = self.image_to_base64(self.dish_image)
         step_base64 = [self.image_to_base64(img) for img in self.step_images]
-        
+        uml_base64 = self.image_to_base64(self.uml_sequence)
+
         return Recipe(
             name=self.name,
             recipe=self.recipe,
             steps_imgs=step_base64,
             total_img=dish_base64, 
-            dish_nutrition=self.nutrition 
+            dish_nutrition=self.nutrition,
+            uml_sequence=uml_base64
         )
     
     @staticmethod

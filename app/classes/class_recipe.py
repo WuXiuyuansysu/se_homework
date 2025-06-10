@@ -3,12 +3,14 @@ import os
 
 #食谱类
 class Recipe:
-    def __init__(self, name, recipe, steps_imgs, total_img, dish_nutrition):
+
+    def __init__(self, name, recipe, steps_imgs, total_img, dish_nutrition, uml_sequence):
         self.name = name
         self.recipe = recipe
         self.steps_imgs = steps_imgs 
         self.total_img = total_img
         self.dish_nutrition = dish_nutrition
+
 
     #转化为字典格式
     def to_dict(self):
@@ -17,7 +19,8 @@ class Recipe:
             "recipe": self.recipe,
             "steps_imgs": self.steps_imgs,
             "total_img": self.total_img,
-            "dish_nutrition": self.dish_nutrition
+            "dish_nutrition": self.dish_nutrition,
+            "uml_sequence": self.uml_sequence
         }
 
 
