@@ -95,3 +95,31 @@ body {
     text-align: center;
     padding: 20px;
 }
+
+.delete-btn {
+    background: #ff4d4f;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.delete-btn:hover {
+    background: #d9363e;
+}
+.clear-history-btn {
+    background: #888;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    margin-left: 16px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.2s;
+}
+.clear-history-btn:hover {
+    background: #555;
+}

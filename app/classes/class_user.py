@@ -153,6 +153,42 @@ class User:
         self.create_history_folder()
         return True
     
+    def delete_recipe_from_likes(self, filename):
+        """
+        从收藏夹删除菜谱
+        """
+        if not filename.endswith(".json"):
+            filename += ".json"
+        path = os.path.join(self.filepath, "likes", filename)
+        if os.path.exists(path):
+            os.remove(path)
+            return True
+        return False
+    
+    def delete_recipe_from_history(self, filename):
+        """
+        从历史记录删除菜谱
+        """
+        if not filename.endswith(".json"):
+            filename += ".json"
+        path = os.path.join(self.filepath, "history", filename)
+        if os.path.exists(path):
+            os.remove(path)
+            return True
+        return False
+    
+    def clear_history(self):
+        """
+        清空历史记录
+        """
+        history_path = os.path.join(self.filepath, "history")
+        if os.path.exists(history_path):
+            for filename in os.listdir(history_path):
+                file_path = os.path.join(history_path, filename)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+            return True
+        return False
 
 #测试
 if __name__ == "__main__":
