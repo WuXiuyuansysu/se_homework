@@ -13,8 +13,8 @@ class User:
         self.filepath = "./data/user_data/"+self.username
         self.likes = self.load_user_likes()
         self.history = self.load_user_history()
-        #self.preferences_file = os.path.join(self.filepath, "likes/preferences.json")
-        #self.update_preferences_file()
+        self.preferences_file = os.path.join(self.filepath, "likes/preferences.json")
+        self.update_preferences_file()
 
     def load_user_history(self):
         """
