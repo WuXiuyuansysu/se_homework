@@ -2,14 +2,44 @@ from classes.class_user import User
 import json
 
 class login:
+    """
+    用户登录管理类，负责用户的注册、认证和用户信息加载。
+
+    属性:
+        success (bool): 登录状态，指示当前是否成功登录，初始为 False。
+        username (str or None): 当前登录用户名，初始为 None。
+        User (User or None): 当前登录用户的 User 对象实例，初始为 None。
+
+    方法:
+        load_user(username: str) -> bool:
+            根据用户名加载用户信息，创建 User 实例。
+
+        authenticate(username: str, password: str) -> bool:
+            验证用户名和密码是否正确，成功则加载用户信息。
+
+        register(username: str, password: str) -> bool:
+            注册新用户，创建用户文件夹及相关数据结构。
+    """
     def __init__(self):
+        """
+        初始化登录类实例，设置默认状态：
+        - success: 登录状态，初始为 False
+        - username: 当前用户名，初始为 None
+        - User: 用户对象实例，初始为 None
+        """
         self.success = False
         self.username = None
         self.User = None
 
     def load_user(self, username):
         """
-        根据用户名和密码加载用户信息
+        根据用户名加载用户信息，创建 User 实例。
+
+        参数：
+            username (str): 用户名
+
+        返回：
+            bool: 如果成功创建用户实例返回 True，否则返回 False
         """
         self.username = username
         self.User = User(username)
@@ -20,7 +50,19 @@ class login:
 
     def authenticate(self, username, password):
         """
-        验证用户名和密码是否正确
+        验证用户名和密码是否正确。
+
+        过程：
+        - 从 ./data/user_table.json 文件中加载用户数据。
+        - 检查是否有用户名和密码匹配的用户。
+        - 匹配成功后调用 load_user 加载用户信息。
+
+        参数：
+            username (str): 用户名
+            password (str): 密码
+
+        返回：
+            bool: 认证成功返回 True，失败返回 False。
         """
         #从./data/user_table.json中加载用户数据
         try:
@@ -39,7 +81,21 @@ class login:
         
     def register(self, username, password):
         """
-        注册新用户
+        注册新用户。
+
+        过程：
+        - 从 ./data/user_table.json 文件中加载现有用户数据。
+        - 检查用户名是否已存在，存在则返回 False。
+        - 添加新用户信息，保存回文件。
+        - 创建用户文件夹及相关子文件夹（收藏、历史记录）。
+        - 初始化 User 实例。
+
+        参数：
+            username (str): 新用户名
+            password (str): 密码
+
+        返回：
+            bool: 注册成功返回 True，失败返回 False。
         """
         #从./data/user_table.json中加载用户数据
         try:

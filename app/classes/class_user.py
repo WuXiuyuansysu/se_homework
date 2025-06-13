@@ -8,6 +8,31 @@ from collections import Counter
 import numpy as np
 
 class User:
+    """
+    用户类，用于管理单个用户的菜谱收藏、历史记录及偏好数据。
+
+    Attributes:
+        username (str): 用户名，用于定位用户文件夹。
+        filepath (str): 用户数据根目录路径。
+        likes (list): 用户收藏的菜谱列表，包含文件名和数据。
+        history (list): 用户历史记录列表，包含文件名和数据。
+        preferences_file (str): 用户偏好数据的文件路径。
+
+    方法:
+        load_user_likes(): 加载用户收藏的菜谱列表。
+        load_user_history(): 加载用户历史记录列表。
+        generate_preferences(): 根据收藏菜谱分析生成用户偏好数据。
+        update_preferences_file(): 更新用户偏好文件，并触发偏好相关操作。
+        get_preferences(): 获取用户偏好数据，优先读取已存在的偏好文件。
+        save_recipe_to_likes(recipe): 保存菜谱到收藏夹，更新收藏和偏好。
+        load_recipe_from_likes(filename): 从收藏夹加载指定菜谱。
+        load_recipe_from_history(filename): 从历史记录加载指定菜谱。
+        save_recipe_to_history(recipe, prefer=False): 保存菜谱到历史记录，prefer=True时保存为偏好文件。
+        create_user_folder(): 创建用户根文件夹。
+        create_likes_folder(): 创建用户收藏文件夹。
+        create_history_folder(): 创建用户历史记录文件夹。
+        setup(): 创建用户相关的所有文件夹。
+    """
     def __init__(self, username: str):
         self.username = username
         self.filepath = "./data/user_data/"+self.username

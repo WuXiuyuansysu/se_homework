@@ -8,13 +8,43 @@ import json
 import re
 
 def get_recipe_steps_description(recipe):
+    """
+    从菜谱中提取每个步骤的编号和描述。
+
+    参数：
+        recipe (dict): 包含菜谱信息的字典，必须含有' steps'键，其值为步骤列表，每个步骤为字典，
+                       其中包含' step'（步骤编号）和'description'（步骤描述）字段。
+
+    返回：
+        list of tuple: 返回一个列表，列表元素为元组(step编号, step描述)，
+                       按照菜谱中步骤顺序排列。
+    """
     steps_description = list()
     for item in recipe['steps']:
         steps_description.append((item['step'], item['description']))
     return steps_description
 
 def generate_steps_image(recipe):
-    """每个做菜步骤的图片"""
+    """
+    根据菜谱的每个烹饪步骤描述生成对应的图片列表。
+
+    参数：
+        recipe (dict): 菜谱信息，包含步骤描述，结构应包含步骤文本，可通过 get_recipe_steps_description() 函数获取步骤列表。
+
+    功能：
+        - 调用图像生成接口，根据每个步骤的文字描述生成对应的图片；
+        - 图片统一保存到本地 ./pictures 目录，文件名为步骤标识（如步骤编号）；
+        - 返回包含每步生成的PIL.Image对象的列表，顺序对应步骤顺序。
+
+    返回：
+        list[PIL.Image.Image]: 由步骤图片组成的列表，列表元素为每个步骤生成的PIL图片对象。
+
+    注意事项：
+        - 依赖外部函数 get_recipe_steps_description(recipe) 返回 [(步骤标识, 描述), ...] 格式的数据；
+        - 需保证网络可用以调用图像接口并下载图片；
+        - 图片保存路径固定为 ./pictures，可根据需求修改；
+        - 若生成失败或网络异常，建议在调用端增加异常处理。
+    """
 
     steps_description = get_recipe_steps_description(recipe)
     step_imgs = list()

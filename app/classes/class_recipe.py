@@ -3,8 +3,32 @@ import os
 
 #食谱类
 class Recipe:
+    """
+    表示一个菜谱的类，包含菜谱名称、步骤、图片、营养信息及相关 UML 顺序图信息。
 
+    属性:
+        name (str): 菜谱名称。
+        recipe (list): 菜谱详细步骤和材料信息的列表。
+        steps_imgs (list): 每个步骤对应的图片路径或图片对象列表。
+        total_img (str): 完成菜品的图片路径或图片对象。
+        dish_nutrition (dict): 菜谱的营养信息字典，如热量、蛋白质、脂肪等。
+        uml_sequence (any): 与菜谱相关的 UML 顺序图数据，用于描述工序或流程。
+
+    方法:
+        to_dict(): 将菜谱对象转换为字典格式，方便序列化或保存。
+    """
     def __init__(self, name, recipe, steps_imgs, total_img, dish_nutrition, uml_sequence):
+        """
+        初始化 Recipe 对象
+
+        参数:
+        - name (str): 菜谱名称
+        - recipe (list): 菜谱详细步骤及材料等
+        - steps_imgs (list): 每个步骤对应的图片路径或对象列表
+        - total_img (str): 完成菜品的图片路径或对象
+        - dish_nutrition (dict): 菜谱的营养信息
+        - uml_sequence (any): UML顺序图信息
+        """
         self.name = name
         self.recipe = recipe
         self.steps_imgs = steps_imgs 
@@ -13,8 +37,8 @@ class Recipe:
         self.uml_sequence = uml_sequence
 
 
-    #转化为字典格式
     def to_dict(self):
+        """将 Recipe 对象转换为字典"""
         return {
             "name": self.name,
             "recipe": self.recipe,
@@ -26,7 +50,19 @@ class Recipe:
 
 
 def load_recipe(file_path):
-    """从JSON文件加载食谱"""
+    """
+    从 JSON 文件加载食谱数据，并返回 Recipe 实例。
+
+    参数:
+    - file_path (str): JSON 文件路径
+
+    返回:
+    - Recipe 对象
+
+    异常:
+    - FileNotFoundError: 文件不存在时抛出
+    - ValueError: 数据不完整时抛出
+    """
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"文件 {file_path} 不存在")
     

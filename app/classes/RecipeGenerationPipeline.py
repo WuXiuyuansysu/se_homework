@@ -11,6 +11,40 @@ from classes.class_recipe import Recipe
 import json
 
 class RecipeGenerationPipeline:
+    """
+    菜谱生成流水线类，用于根据食材、菜系及用户偏好生成完整的菜谱信息。
+
+    该流水线包含以下步骤：
+    1. 生成菜谱（根据用户偏好选择不同生成接口）
+    2. 生成菜谱名称
+    3. 生成菜品外观描述
+    4. 生成菜品主图像
+    5. 生成营养分析数据
+    6. 生成菜谱制作步骤的UML序列图
+    7. 生成每个步骤对应的图片
+
+    最终输出包含所有信息的 Recipe 对象。
+
+    Attributes:
+        ingredients (str): 用户输入的食材列表字符串。
+        cuisine_type (str): 菜系类型，如“川菜”、“意大利菜”等。
+        preferences (str|None): 用户口味及偏好描述，默认无。
+        recipe (dict|None): 生成的菜谱详细信息。
+        name (str|None): 菜谱名称。
+        appearance_desc (str|None): 菜品外观描述文本。
+        dish_image (PIL.Image|None): 菜品主图像。
+        nutrition (dict|None): 菜品营养分析数据。
+        uml_sequence (PIL.Image|None): 菜谱步骤的UML序列图。
+        step_images (list[PIL.Image]|None): 菜谱每个步骤对应的图片列表。
+
+    Methods:
+        execute():
+            执行完整的菜谱生成流程，返回包含所有生成信息的 Recipe 对象，或包含错误信息的字典。
+        format_response():
+            将生成的图片转换为Base64编码，并构建Recipe对象。
+        image_to_base64(image):
+            静态方法，将PIL.Image对象转换为Base64字符串。
+    """
     def __init__(self, ingredients, cuisine_type,preferences=None):
         self.ingredients = ingredients
         self.cuisine_type = cuisine_type

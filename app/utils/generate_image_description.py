@@ -5,7 +5,31 @@ import re
 
 
 def generate_image_description(recipe):
-    """生成菜品外貌描述"""
+    """
+    根据菜谱信息生成菜品外观的详细描述。
+
+    参数:
+        recipe (dict): 包含菜谱内容的字典，必须包含以下字段：
+            - 'name': 菜谱名称（字符串）
+            - 'ingredients': 食材列表，每个元素是包含 'name' 和 'quantity' 的字典
+            - 'steps': 制作步骤列表，每个元素为包含 'description' 的字典
+            - 'total_time': 总烹饪时间（字符串）
+
+    功能:
+        - 构建专业提示词，基于菜谱名称、食材、关键步骤和时间生成详细描述；
+        - 调用 AI 接口生成关于菜品视觉外貌的 JSON 格式描述，包括摆盘、食材外观、酱汁光泽和摄影建议；
+        - 返回一个 JSON 对象（Python 字典格式），可用于图像生成提示。
+
+    返回:
+        dict: 包含以下字段的 JSON 对象：
+            - 'style': 摆盘风格描述
+            - 'ingredients_visual': 主要食材的视觉效果
+            - 'sauce_gloss': 酱汁或汤汁的光泽表现
+            - 'photography_tips': 拍摄建议
+
+    注意:
+        输出 JSON 格式严格受限，必须满足接口返回的规范。
+    """
     
     prompt = f"""
         你是一个专业美食摄影师，需要根据以下菜谱生成菜品外观的详细描述。
