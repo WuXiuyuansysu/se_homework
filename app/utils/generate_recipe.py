@@ -2,7 +2,7 @@ import openai
 from openai import OpenAI  # 明确导入OpenAI类
 import json
 import re
-
+import config
 def generate_recipe(ingredients, cuisine_type):
     """
     根据指定食材与菜系类型生成标准化菜谱。
@@ -60,7 +60,7 @@ def generate_recipe(ingredients, cuisine_type):
     }}"""
 
     client = OpenAI(
-        api_key="sk-b8e09876066e40aab6ee92ba4a12629b",
+        api_key=config.API_KEY_0,
         base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
     

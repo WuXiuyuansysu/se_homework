@@ -1,7 +1,7 @@
 import openai
 from openai import OpenAI
 import json
-
+import config
 def generate_nutrition_analysis(recipe):
     """
     根据菜谱信息生成详细的营养分析。
@@ -69,7 +69,7 @@ def generate_nutrition_analysis(recipe):
         }}"""
     
     client = OpenAI(
-        api_key="sk-W0rpStc95T7JVYVwDYc29IyirjtpPPby6SozFMQr17m8KWeo",
+        api_key=config.API_KEY_1,
         base_url="https://api.suanli.cn/v1"
     )
     

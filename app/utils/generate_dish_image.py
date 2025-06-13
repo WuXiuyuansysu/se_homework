@@ -2,6 +2,7 @@ from PIL import Image
 import requests
 from dashscope import ImageSynthesis
 import os
+import config
 
 def generate_dish_image(description):
     """
@@ -38,7 +39,7 @@ def generate_dish_image(description):
     - 自然光
     """
 
-    rsp = ImageSynthesis.call(api_key="sk-b8e09876066e40aab6ee92ba4a12629b",
+    rsp = ImageSynthesis.call(api_key=config.API_KEY_0,
                             model="wanx2.1-t2i-turbo",
                             prompt=prompt,
                             n=1,

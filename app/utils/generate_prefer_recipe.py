@@ -2,7 +2,7 @@ import openai
 from openai import OpenAI  # 明确导入OpenAI类
 import json
 import re
-
+import config
 def generate_prefer_recipe(preferences):
     """
     根据用户偏好生成详细的菜谱。
@@ -61,7 +61,7 @@ def generate_prefer_recipe(preferences):
     }}"""
 
     client = OpenAI(
-        api_key="sk-b8e09876066e40aab6ee92ba4a12629b",
+        api_key=config.API_KEY_0,
         base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
     

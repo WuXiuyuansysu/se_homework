@@ -2,7 +2,7 @@ import openai
 from openai import OpenAI  # 明确导入OpenAI类
 import json
 import re
-
+import config
 
 def generate_image_description(recipe):
     """
@@ -58,7 +58,7 @@ def generate_image_description(recipe):
         }}"""
     
     client = OpenAI(
-        api_key="sk-W0rpStc95T7JVYVwDYc29IyirjtpPPby6SozFMQr17m8KWeo",
+        api_key=config.API_KEY_1,
         base_url="https://api.suanli.cn/v1"
     )
     

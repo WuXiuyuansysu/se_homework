@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-
+API_KEY_0 = "sk-b8e09876066e40aab6ee92ba4a12629b"
+API_KEY_1 = "sk-W0rpStc95T7JVYVwDYc29IyirjtpPPby6SozFMQr17m8KWeo"
 class Config:
     
     

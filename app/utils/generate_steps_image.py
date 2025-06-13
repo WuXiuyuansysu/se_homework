@@ -6,7 +6,7 @@ import openai
 from openai import OpenAI
 import json
 import re
-
+import config
 def get_recipe_steps_description(recipe):
     """
     从菜谱中提取每个步骤的编号和描述。
@@ -50,7 +50,7 @@ def generate_steps_image(recipe):
     step_imgs = list()
     for step_description in steps_description:
         prompt = step_description[1]
-        rsp = ImageSynthesis.call(api_key="sk-b8e09876066e40aab6ee92ba4a12629b",
+        rsp = ImageSynthesis.call(api_key=config.API_KEY_0,
                         model="wanx2.1-t2i-turbo",
                         prompt=prompt,
                         n=1,

@@ -12,7 +12,7 @@ from classes.class_recipe import load_recipe, Recipe
 from classes.RecipeGenerationPipeline import RecipeGenerationPipeline
 from collections import Counter
 import numpy as np
-
+import config
 class User:
     """
     用户类，用于管理单个用户的菜谱收藏、历史记录及偏好数据。
@@ -149,7 +149,7 @@ class User:
             """
             
             client = OpenAI(
-                api_key="sk-W0rpStc95T7JVYVwDYc29IyirjtpPPby6SozFMQr17m8KWeo",
+                api_key=config.API_KEY_1,
                 base_url="https://api.suanli.cn/v1"
             )
             
@@ -244,7 +244,7 @@ class User:
         """
         
         client = OpenAI(
-            api_key="sk-W0rpStc95T7JVYVwDYc29IyirjtpPPby6SozFMQr17m8KWeo",
+            api_key=config.API_KEY_1,
             base_url="https://api.suanli.cn/v1"
         )
         
