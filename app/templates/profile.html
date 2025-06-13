@@ -18,6 +18,40 @@
             </div>
         </div>
 
+        {% if nutrition_advice %}
+        <div class="section nutrition-advice-section">
+            <h2>个人营养分析与建议</h2>
+            <div class="nutrition-analysis">
+                <strong>整体营养分析：</strong>
+                <p>{{ nutrition_advice.nutrition_analysis }}</p>
+            </div>
+            <div class="detailed-advice">
+                <strong>详细建议：</strong>
+                <ul>
+                    <li>热量：{{ nutrition_advice.detailed_advice.calories }}</li>
+                    <li>蛋白质：{{ nutrition_advice.detailed_advice.protein }}</li>
+                    <li>脂肪：{{ nutrition_advice.detailed_advice.fat }}</li>
+                </ul>
+            </div>
+            <div class="ingredient-recommendations">
+                <strong>食材调整建议：</strong>
+                <ul>
+                    {% for rec in nutrition_advice.ingredient_recommendations %}
+                    <li>{{ rec }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="health-tips">
+                <strong>健康小贴士：</strong>
+                <ul>
+                    {% for tip in nutrition_advice.health_tips %}
+                    <li>{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="sections">
             <div class="section">
                 <h2>我的收藏</h2>

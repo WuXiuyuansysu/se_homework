@@ -6,6 +6,7 @@ from classes.class_user import User
 from classes.class_recipe import Recipe
 from classes.class_login import login
 import json
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # 设置会话密钥
@@ -68,20 +69,29 @@ def generate():
         
     ingredients = request.form.get('ingredients')
     cuisine_type = request.form.get('cuisine_type')
+    prefer_recipe = request.form.get('prefer_recipe') == '1'
 
-    pipline = RecipeGenerationPipeline(ingredients, cuisine_type)
-    result = pipline.execute()
-        
-
-    #保存历史记录
     user = User(session['username'])
+    if prefer_recipe:
+        # 读取用户健康偏好
+        preferences = user.get_preferences() if hasattr(user, 'get_preferences') else None
+        pipline = RecipeGenerationPipeline(ingredients, cuisine_type, preferences=preferences)
+        result = pipline.excute_with_preferences()
+    else:
+        pipline = RecipeGenerationPipeline(ingredients, cuisine_type)
+        result = pipline.execute()
+
+    if isinstance(result, dict) and "error" in result:
+        return jsonify(result), 500
+
     trans_data = {
         "name": result.name,
         "recipe": result.recipe,
         "steps_images": result.steps_imgs,
         "dish_image": result.total_img,
         "nutrition": result.dish_nutrition,
-        "uml_sequence": result.uml_sequence
+        "uml_sequence": result.uml_sequence,
+        "dangerous_ingredients": result.recipe.get("dangerous_ingredients", []) if isinstance(result.recipe, dict) else []
     }
     if user:
         user.save_recipe_to_history(result)
@@ -102,12 +112,21 @@ def profile():
     # 获取收藏和历史记录的菜谱列表
     likes_recipes = user.load_user_likes()
     history_recipes = user.load_user_history()
+
+    # 读取营养建议
+    advice_file = user.advice_file
+    print(f"Loading nutrition advice from: {advice_file}")
+    nutrition_advice = None
+    if os.path.exists(advice_file):
+        with open(advice_file, 'r', encoding='utf-8') as f:
+            nutrition_advice = json.load(f)
     
     return render_template(
         'profile.html', 
         username=username,
         likes=likes_recipes,
-        history=history_recipes
+        history=history_recipes,
+        nutrition_advice=nutrition_advice
     )
 
 # 加载菜谱
@@ -143,6 +162,7 @@ def load_recipe():
         "steps_images": recipe.steps_imgs,
         "nutrition": recipe.dish_nutrition,
         "uml_sequence": recipe.uml_sequence,
+        "dangerous_ingredients": recipe.recipe.get("dangerous_ingredients", []) if isinstance(recipe.recipe, dict) else []
     })
 
 # 收藏菜谱
@@ -161,6 +181,8 @@ def favorite():
             return jsonify({'success': False, 'message': '菜谱未找到'}), 404
         
         user.save_recipe_to_likes(recipe)
+        user.update_preferences_file()
+
         return jsonify({'success': True})
     except Exception as e:
         print(f"Error saving recipe to favorites: {e}")

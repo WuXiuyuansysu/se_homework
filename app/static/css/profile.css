@@ -123,3 +123,20 @@ body {
 .clear-history-btn:hover {
     background: #555;
 }
+
+.nutrition-advice-section {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.nutrition-advice-section h2 {
+    margin-top: 0;
+}
+.nutrition-advice-section ul {
+    margin: 0 0 10px 20px;
+}
+.nutrition-advice-section li {
+    margin-bottom: 4px;
+}

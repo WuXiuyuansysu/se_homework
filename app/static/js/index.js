@@ -5,6 +5,7 @@ let currentRecipeData = null;
 function buildRecipeHTML(data) {
     return `
         <button id="favorite-btn" class="favorite-btn">收藏</button>
+        <span id="favorite-status" style="margin-left:10px;color:#888;font-size:0.95em;"></span>
         <div class="export-buttons">
             <button class="export-btn" id="export-txt">📝 导出为TXT</button>
             <button class="export-btn" id="export-dish-png">🖼️ 导出主菜图片</button>
@@ -12,7 +13,13 @@ function buildRecipeHTML(data) {
             <button class="export-btn" id="export-pdf">📄 导出为PDF</button>
         </div>
         <div class="recipe-content">
-            <div class="recipe-header">
+            <div class="recipe-header">            
+            ${data.dangerous_ingredients && data.dangerous_ingredients.length > 0 ? `
+                <div class="dangerous-ingredients-warning">
+                    <strong>⚠️ 危险食材提示：</strong>
+                    <span>${data.dangerous_ingredients.join('，')}</span>
+                </div>
+            ` : ''}
                 <h2>${data.recipe.name}</h2>
                 
                 <!-- 菜品图片展示 -->
@@ -34,6 +41,8 @@ function buildRecipeHTML(data) {
                     </div>
                 </div>
             </div>
+
+
 
             <!-- 新增营养分析部分 -->
             <div class="section nutrition-section">
@@ -158,6 +167,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(this);
         const loading = document.getElementById('loading');
         const resultContainer = document.getElementById('result-container');
+        // 新增：个性化选项
+        const preferChecked = document.getElementById('prefer_recipe').checked;
+        formData.append('prefer_recipe', preferChecked ? '1' : '0');
         
         
         try {
@@ -468,9 +480,14 @@ async function loadRecipe(type, filename) {
 // 收藏按钮事件绑定
 function bindFavoriteButton(recipeData) {
     const btn = document.getElementById('favorite-btn');
+    const status = document.getElementById('favorite-status');
     if (!btn) return;
     btn.addEventListener('click', function () {
         btn.disabled = true;
+        if (status) {
+            status.textContent = '正在收藏...';
+            status.style.color = '#888';
+        }
         fetch('/favorite', {
             method: 'POST',
             headers: {
@@ -483,14 +500,26 @@ function bindFavoriteButton(recipeData) {
             if (data.success) {
                 btn.textContent = '已收藏';
                 btn.classList.add('saved');
+                if (status) {
+                    status.textContent = '已添加到收藏';
+                    status.style.color = '#28a745';
+                }
             } else {
                 btn.textContent = '收藏失败';
                 btn.disabled = false;
+                if (status) {
+                    status.textContent = '收藏失败，请重试';
+                    status.style.color = '#dc3545';
+                }
             }
         })
         .catch(() => {
             btn.textContent = '收藏失败';
             btn.disabled = false;
+            if (status) {
+                status.textContent = '收藏失败，请检查网络';
+                status.style.color = '#dc3545';
+            }
         });
     });
 }

@@ -12,6 +12,7 @@ def generate_recipe(ingredients, cuisine_type):
     2. 确保JSON的语法正确性，包括引号、逗号和大括号匹配
     3. 直接以JSON对象开头，不要有其他前缀
     4. 每种食材和调料都精确到克
+    5. 明显无法食用的食材需要在结果中标注（如原子弹，大便等）
 
     食材：{ingredients}
     菜式：{cuisine_type}
@@ -28,6 +29,7 @@ def generate_recipe(ingredients, cuisine_type):
             ...
         ],
         "total_time": "40分钟"
+        "dangerous_ingredients": ["成分1", "成分2"],
     }}"""
 
     client = OpenAI(
