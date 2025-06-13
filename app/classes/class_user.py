@@ -1,4 +1,10 @@
+import sys
 import os
+import openai
+from openai import OpenAI
+# 获取当前文件所在目录的父目录（项目根目录）
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)  # 添加到模块搜索路径
 import json
 
 from gradio_client import file
@@ -38,8 +44,8 @@ class User:
         self.filepath = "./data/user_data/"+self.username
         self.likes = self.load_user_likes()
         self.history = self.load_user_history()
-        self.preferences_file = os.path.join(self.filepath, "likes/preferences.json")
-        self.update_preferences_file()
+        self.preferences_file = os.path.join(self.filepath, "preferences.json")
+        self.advice_file=os.path.join(self.filepath, "advice.json")
 
     def load_user_history(self):
         """
@@ -64,7 +70,7 @@ class User:
                     print(f"Error loading file {filename}: {str(Exception)}")
                     continue
         return history_list
-    
+   
     def generate_preferences(self):
         """
         分析用户收藏菜谱，生成偏好数据
@@ -84,7 +90,6 @@ class User:
             "cooking_time_preference": 0
         }
         
-        # 如果没有收藏，返回空偏好
         if not self.likes:
             return preferences
         
@@ -93,30 +98,28 @@ class User:
         flavor_sums = {"spicy": 0, "sweet": 0, "sour": 0, "salty": 0, "bitter": 0}
         category_counter = Counter()
         cooking_times = []
-        
-        # 分析每个收藏菜谱
+        # 收集所有食材用于AI分析
+        all_ingredients = []
         for like in self.likes:
             filename = like["filename"]
             recipe = self.load_recipe_from_likes(filename)
             
             if recipe:
-                # 食材偏好
-                for ingredient in recipe.recipe:
-                    ingredient_counter[ingredient] += 1
-                
-                # 营养偏好（平均值）
+                # 收集食材
+                all_ingredients.extend(recipe.recipe)
+                # 营养偏好
                 if recipe.dish_nutrition:
                     for nutrient in nutrition_sums:
                         if nutrient in recipe.dish_nutrition:
                             nutrition_sums[nutrient] += recipe.dish_nutrition[nutrient]
                 
-                # 口味偏好（如果有）
+                # 口味偏好
                 if hasattr(recipe, 'flavors') and recipe.flavors:
                     for flavor in flavor_sums:
                         if flavor in recipe.flavors:
                             flavor_sums[flavor] += recipe.flavors[flavor]
                 
-                # 类别偏好（如果有）
+                # 类别偏好
                 if hasattr(recipe, 'categories') and recipe.categories:
                     for category in recipe.categories:
                         category_counter[category] += 1
@@ -124,47 +127,183 @@ class User:
                 # 烹饪时间偏好
                 if hasattr(recipe, 'cooking_time') and recipe.cooking_time:
                     cooking_times.append(recipe.cooking_time)
+        # 使用AI标准化食材并计算权重
+        print(all_ingredients)
+        if all_ingredients:
+            prompt = f"""
+            你是一个专业厨师助手，需要根据以下食材列表生成标准化的食材偏好分析。
+            请严格按照以下规则输出：
+            
+            ----- 规则 -----
+            1. 输出必须是纯净的 JSON 对象
+            2. JSON 结构: {{"ingredient_preferences": {{"食材1": 权重, "食材2": 权重, ...}}}}
+            3. 处理要求:
+            - 将同一种食材的不同名称统一为标准名称(如"番茄"和"西红柿"统一为"番茄")
+            - 合并同类食材(如"鸡胸肉"和"鸡肉"统一为"鸡肉")
+            - 去除调味品和辅料(盐、糖、酱油等)
+            - 计算每种标准化食材的出现频率作为权重(值范围0-1，保留3位小数)
+            - 只保留权重≥0.05的食材
+            
+            ----- 输入数据 -----
+            原始食材列表: {all_ingredients}
+            """
+            
+            client = OpenAI(
+                api_key="sk-W0rpStc95T7JVYVwDYc29IyirjtpPPby6SozFMQr17m8KWeo",
+                base_url="https://api.suanli.cn/v1"
+            )
+            
+            response = client.chat.completions.create(
+                model="free:Qwen3-30B-A3B",
+                messages=[
+                    {"role": "system", "content": "你是一个专业厨师助手，输出必须是纯净的JSON对象"},
+                    {"role": "user", "content": prompt}
+                ],
+                response_format={"type": "json_object"}
+            )
+            
+            # 解析AI返回的食材偏好
+            ai_result = json.loads(response.choices[0].message.content)
+            preferences["ingredient_preferences"] = ai_result.get("ingredient_preferences", {})
         
-        # 计算食材偏好权重（归一化）
-        total_ingredients = sum(ingredient_counter.values())
-        for ingredient, count in ingredient_counter.items():
-            preferences["ingredient_preferences"][ingredient] = round(count / total_ingredients, 3)
-        
-        # 计算营养平均值
+        # 其他偏好保持手动计算
         num_recipes = len(self.likes)
+        
+        # 营养平均值
         for nutrient in preferences["nutrition_preferences"]:
             preferences["nutrition_preferences"][nutrient] = round(nutrition_sums[nutrient] / num_recipes, 1)
         
-        # 计算口味平均值
+        # 口味平均值
         for flavor in preferences["flavor_preferences"]:
             preferences["flavor_preferences"][flavor] = round(flavor_sums[flavor] / num_recipes, 1)
         
-        # 计算类别偏好权重
+        # 类别偏好权重
         total_categories = sum(category_counter.values())
-        for category, count in category_counter.items():
-            preferences["category_preferences"][category] = round(count / total_categories, 3)
+        if total_categories > 0:
+            for category, count in category_counter.items():
+                preferences["category_preferences"][category] = round(count / total_categories, 3)
         
-        # 计算平均烹饪时间（中位数）
+        # 烹饪时间中位数
         if cooking_times:
             preferences["cooking_time_preference"] = int(np.median(cooking_times))
         
         return preferences
-    
+    def generate_nutrition_advice(self,preferences):
+        """
+        使用AI分析用户收藏菜谱，生成个性化营养建议
+        返回格式: {
+            "nutrition_analysis": "整体营养分析文本",
+            "detailed_advice": {
+                "calories": "卡路里建议",
+                "protein": "蛋白质建议",
+                "fat": "脂肪建议"
+            },
+            "ingredient_recommendations": ["建议1", "建议2", ...],
+            "health_tips": ["健康小贴士1", ...]
+        }
+        """
+        # 获取用户偏好数据
+        preferences = self.generate_preferences()
+        
+        # 准备AI分析提示
+        prompt = f"""
+        你是一个专业营养师，请根据用户的饮食偏好数据生成个性化营养建议。
+        严格按照以下规则输出JSON格式结果：
+        
+        ----- 输出规则 -----
+        1. 必须是纯净JSON对象，包含以下字段:
+            - "nutrition_analysis": (字符串) 50-100字的整体营养评估
+            - "detailed_advice": (对象) 包含calories/protein/fat三个键的建议文本
+            - "ingredient_recommendations": (字符串数组) 3-5条食材调整建议
+            - "health_tips": (字符串数组) 2-4条健康生活建议
+        
+        2. 分析要求:
+            - 基于营养数据: {preferences['nutrition_preferences']}
+            - 结合口味偏好: {preferences['flavor_preferences']}
+            - 参考食材偏好: {preferences['ingredient_preferences']}
+            - 考虑烹饪时间: {preferences['cooking_time_preference']}分钟
+        
+        3. 建议原则:
+            - 针对营养不平衡点提出具体改进方案
+            - 根据口味偏好推荐替代食材
+            - 推荐易获取的本地食材
+            - 结合烹饪时间推荐快手健康方案
+        
+        ----- 用户数据详情 -----
+        营养偏好(每道菜平均值):
+            - 热量: {preferences['nutrition_preferences']['calories']} kcal
+            - 蛋白质: {preferences['nutrition_preferences']['protein']} g
+            - 脂肪: {preferences['nutrition_preferences']['fat']} g
+        
+        口味偏好(1-5分):
+            - 辣: {preferences['flavor_preferences']['spicy']}
+            - 甜: {preferences['flavor_preferences']['sweet']}
+            - 咸: {preferences['flavor_preferences']['salty']}
+        
+        常用食材(权重): {list(preferences['ingredient_preferences'].items())[:5]}...
+        """
+        
+        client = OpenAI(
+            api_key="sk-W0rpStc95T7JVYVwDYc29IyirjtpPPby6SozFMQr17m8KWeo",
+            base_url="https://api.suanli.cn/v1"
+        )
+        
+        response = client.chat.completions.create(
+            model="free:Qwen3-30B-A3B",
+            messages=[
+                {"role": "system", "content": "你是一个专业营养师，输出必须是纯净JSON对象"},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.3  # 降低随机性，确保专业建议
+        )
+        
+        # 解析AI返回的营养建议
+        try:
+            advice = json.loads(response.choices[0].message.content)
+            
+            # 添加基础数据参考
+            advice["reference_data"] = {
+                "avg_calories": preferences['nutrition_preferences']['calories'],
+                "avg_protein": preferences['nutrition_preferences']['protein'],
+                "avg_fat": preferences['nutrition_preferences']['fat']
+            }
+            
+            return advice
+        
+        except json.JSONDecodeError:
+            # 备用方案：返回结构化错误信息
+            return {
+                "error": "AI分析失败，请稍后再试",
+                "fallback_advice": "建议保持饮食多样性，增加蔬菜水果摄入"
+            }
     def update_preferences_file(self):
         """
-        更新用户偏好文件
+        更新用户偏好文件，同时将营养建议保存到单独文件
         """
         preferences = self.generate_preferences()
+        print(f"Generated preferences")
+        
+        advice = self.generate_nutrition_advice(preferences)
+        print(f"Generated nutrition advice")
+        
         try:
+            # 保存偏好文件
             with open(self.preferences_file, "w", encoding="utf-8") as f:
                 json.dump(preferences, f, ensure_ascii=False, indent=4)
-            pipline = RecipeGenerationPipeline(None,None,preferences)
+            
+            # 保存营养建议到新文件（在原文件名后添加 _advice 后缀）
+            advice_file = self.advice_file
+            with open(advice_file, "w", encoding="utf-8") as f_advice:
+                json.dump(advice, f_advice, ensure_ascii=False, indent=4)
+            
+            pipline = RecipeGenerationPipeline(None, None, preferences)
             result = pipline.execute()
-            self.save_recipe_to_history(result,True)
-            print(f"update preferences.")
+            self.save_recipe_to_history(result, True)
+            print(f"Updated preferences and saved nutrition advice separately.")
             return True
         except Exception as e:
-            print(f"Error updating preferences file: {str(e)}")
+            print(f"Error updating files: {str(e)}")
             return False
     
     def get_preferences(self):
@@ -182,7 +321,7 @@ class User:
         # 否则生成新的偏好文件
         return self.generate_preferences()
     
-    def save_recipe_to_likes(self, recipe):
+    def save_recipe_to_likes(self, recipe, address=""):
         """
         将Recipe对象保存到收藏夹（likes）文件夹，文件名为菜谱名+".json"
         保存成功后更新收藏列表和偏好文件
@@ -311,6 +450,7 @@ class User:
 
 #测试
 if __name__ == "__main__":
+    
     user = User( "testuser")
     user.setup()
     print("User folder created:", user.filepath)
@@ -324,7 +464,8 @@ if __name__ == "__main__":
         recipe=["番茄", "鸡蛋", "盐", "油"],
         steps_imgs=["step1.png", "step2.png"],
         total_img="total_dish.png",
-        dish_nutrition={"calories": 200, "protein": 10, "fat": 5}
+        dish_nutrition={"calories": 200, "protein": 10, "fat": 5},
+        uml_sequence=None
     )
     user.save_recipe_to_likes(recipe, "test_recipe.json")
     user.save_recipe_to_history(recipe, "test_recipe_history.json")

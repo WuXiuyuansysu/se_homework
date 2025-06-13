@@ -3,20 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人中心 - 美食生成器</title>
+    <title>个人中心 - 个性化菜谱生成器</title>
     <link rel="stylesheet" href="./static/css/profile.css">
     <script src="./static/js/profile.js"></script>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>美食生成器</h1>
+            <h1>个性化菜谱生成器</h1>
             <div class="user-info">
                 <span>欢迎, {{ username }}</span>
                 <button class="home-btn" onclick="location.href='/'">回到首页</button>
                 <button class="logout-btn" onclick="location.href='/logout'">退出登录</button>
             </div>
         </div>
+
+        {% if nutrition_advice %}
+        <div class="section nutrition-advice-section">
+            <h2>个人营养分析与建议</h2>
+            <div class="nutrition-analysis">
+                <strong>整体营养分析：</strong>
+                <p>{{ nutrition_advice.nutrition_analysis }}</p>
+            </div>
+            <div class="detailed-advice">
+                <strong>详细建议：</strong>
+                <ul>
+                    <li>热量：{{ nutrition_advice.detailed_advice.calories }}</li>
+                    <li>蛋白质：{{ nutrition_advice.detailed_advice.protein }}</li>
+                    <li>脂肪：{{ nutrition_advice.detailed_advice.fat }}</li>
+                </ul>
+            </div>
+            <div class="ingredient-recommendations">
+                <strong>食材调整建议：</strong>
+                <ul>
+                    {% for rec in nutrition_advice.ingredient_recommendations %}
+                    <li>{{ rec }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="health-tips">
+                <strong>健康小贴士：</strong>
+                <ul>
+                    {% for tip in nutrition_advice.health_tips %}
+                    <li>{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
 
         <div class="sections">
             <div class="section">

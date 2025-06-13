@@ -1,0 +1,22 @@
+{
+    "nutrition_analysis": "整体营养均衡，蛋白质充足，但脂肪含量偏高，建议增加膳食纤维摄入。",
+    "detailed_advice": {
+        "calories": "可适当减少油脂使用量，选择清蒸或水煮方式",
+        "protein": "保持鸡胸肉和豆腐摄入，可增加豆制品种类",
+        "fat": "用橄榄油替代部分动物油，增加坚果摄入"
+    },
+    "ingredient_recommendations": [
+        "增加燕麦片提升膳食纤维",
+        "添加西兰花补充维生素C",
+        "用藜麦替代部分主食"
+    ],
+    "health_tips": [
+        "每日保持30分钟快走促进代谢",
+        "多摄入深色蔬菜改善营养结构"
+    ],
+    "reference_data": {
+        "avg_calories": 584.0,
+        "avg_protein": 38.0,
+        "avg_fat": 24.4
+    }
+}
