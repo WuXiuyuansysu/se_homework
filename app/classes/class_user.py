@@ -19,9 +19,8 @@ class User:
         self.filepath = "./data/user_data/"+self.username
         self.likes = self.load_user_likes()
         self.history = self.load_user_history()
-        self.preferences_file = os.path.join(self.filepath, "likes/preferences.json")
-        self.advice_file=os.path.join(self.filepath, "likes/advice.json")
-        self.update_preferences_file()
+        self.preferences_file = os.path.join(self.filepath, "preferences.json")
+        self.advice_file=os.path.join(self.filepath, "advice.json")
 
     def load_user_history(self):
         """
@@ -258,7 +257,10 @@ class User:
         更新用户偏好文件，同时将营养建议保存到单独文件
         """
         preferences = self.generate_preferences()
+        print(f"Generated preferences")
+        
         advice = self.generate_nutrition_advice(preferences)
+        print(f"Generated nutrition advice")
         
         try:
             # 保存偏好文件
@@ -266,7 +268,7 @@ class User:
                 json.dump(preferences, f, ensure_ascii=False, indent=4)
             
             # 保存营养建议到新文件（在原文件名后添加 _advice 后缀）
-            advice_file = self.preferences_file.replace(".json", "_advice.json")
+            advice_file = self.advice_file
             with open(advice_file, "w", encoding="utf-8") as f_advice:
                 json.dump(advice, f_advice, ensure_ascii=False, indent=4)
             

@@ -7,13 +7,16 @@ def generate_prefer_recipe(preferences):
     """食谱"""
 
     prompt = f"""
-    请根据以下用户喜好生成详细的菜谱，严格遵守以下要求：
+    请根据以下食材和烹饪风格以及用户喜好生成详细的菜谱，严格遵守以下要求：
     1. 输出必须是纯净的JSON对象，禁止包含任何其他文本、注释、XML/HTML标签或Markdown代码块
     2. 确保JSON的语法正确性，包括引号、逗号和大括号匹配
     3. 直接以JSON对象开头，不要有其他前缀
     4. 每种食材和调料都精确到克
+    5. 明显无法食用的食材需要在结果中标注（如原子弹，大便等）
 
-    {preferences}
+    食材：{ingredients}
+    菜式：{cuisine_type}
+    用户喜好: {preferences}
 
     示例格式：
     {{
@@ -27,6 +30,7 @@ def generate_prefer_recipe(preferences):
             ...
         ],
         "total_time": "40分钟"
+        "dangerous_ingredients": ["成分1", "成分2"],
     }}"""
 
     client = OpenAI(

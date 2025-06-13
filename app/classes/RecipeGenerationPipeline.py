@@ -64,6 +64,40 @@ class RecipeGenerationPipeline:
         except Exception as e:
             return {"error": str(e)}
     
+    def excute_with_preferences(self):
+        """执行完整的菜谱生成流程，包含用户偏好"""
+        try:
+            self.recipe = generate_prefer_recipe(
+                ingredients=self.ingredients,
+                cuisine_type=self.cuisine_type,
+                preferences=self.preferences
+            )
+            print("recipe done")
+            
+            self.name = self.recipe.get("name")
+            if not self.name:
+                self.name = "未知菜谱"
+                print("未能生成菜谱名称，使用默认名称 '未知菜谱'")
+
+            self.appearance_desc = generate_image_description(self.recipe)
+            print("appearance_desc done")
+
+            self.dish_image = generate_dish_image(self.appearance_desc)
+            print("dish_image done")
+
+            self.nutrition = generate_nutrition_analysis(self.recipe)
+            print("nutrition done")
+
+            self.uml_sequence = build_sequence(self.recipe)
+            print("uml done")
+
+            self.step_images = generate_steps_image(self.recipe)
+            print("step_image done")
+            return self.format_response()
+        except Exception as e:
+            return {"error": str(e)}
+        
+    
     def format_response(self):
         """格式化生成结果为API响应格式"""
 

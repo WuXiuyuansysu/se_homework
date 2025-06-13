@@ -1,0 +1,17 @@
+{
+    "ingredient_preferences": {},
+    "nutrition_preferences": {
+        "calories": 584.0,
+        "protein": 38.0,
+        "fat": 24.4
+    },
+    "flavor_preferences": {
+        "spicy": 0.0,
+        "sweet": 0.0,
+        "sour": 0.0,
+        "salty": 0.0,
+        "bitter": 0.0
+    },
+    "category_preferences": {},
+    "cooking_time_preference": 0
+}
