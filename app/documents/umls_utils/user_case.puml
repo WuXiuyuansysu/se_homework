@@ -4,27 +4,147 @@ left to right direction
 actor "User" as user 
 
 rectangle "AI菜谱生成系统" {
-  usecase "输入原料和菜系风格" as uc_input
+  usecase "用户注册/登录" as uc_login
+  usecase "输入原料" as uc_input_ingredients
+  usecase "选择口味偏好" as uc_select_preferences
   usecase "生成菜谱" as uc_generate_recipe
   usecase "查看生成菜谱" as uc_view_recipe
   usecase "生成步骤图片" as uc_generate_steps_img
   usecase "查看步骤图片" as uc_view_steps_img
   usecase "生成成品图片" as uc_generate_dish_img
   usecase "查看成品图片" as uc_view_dish_img
+  usecase "收藏菜谱" as uc_save_like
+  usecase "查看历史记录" as uc_view_history
 
-  user --> uc_input
+  user --> uc_login
+  user --> uc_input_ingredients
+  user --> uc_select_preferences
   user --> uc_view_recipe
   user --> uc_view_steps_img
   user --> uc_view_dish_img
+  user --> uc_save_like
+  user --> uc_view_history
 
-
-  uc_generate_recipe .> uc_input : <<include>>
+  uc_generate_recipe .> uc_input_ingredients : <<include>>
+  uc_generate_recipe .> uc_select_preferences : <<include>>
+  
   uc_generate_steps_img .> uc_generate_recipe : <<extend>>
   uc_generate_dish_img .> uc_generate_recipe : <<extend>>
   
-
   uc_view_recipe .> uc_generate_recipe : <<extend>>
   uc_view_steps_img .> uc_generate_steps_img : <<extend>>
   uc_view_dish_img .> uc_generate_dish_img : <<extend>>
 }
+@enduml
+
+'--------------------------------------------------
+package "用户登录和注册流程" {
+  actor User
+  participant "登录模块" as Login
+  participant "用户数据存储" as UserData
+
+  User -> Login: 输入用户名和密码（登录）
+  Login -> UserData: 读取 user_table.json
+  UserData --> Login: 返回用户数据
+  alt 用户名密码匹配
+      Login -> Login: 加载用户信息
+      Login --> User: 登录成功
+  else 不匹配或文件不存在
+      Login --> User: 登录失败
+  end
+
+  User -> Login: 输入用户名和密码（注册）
+  Login -> UserData: 读取 user_table.json
+  UserData --> Login: 返回用户数据
+  alt 用户名不存在
+      Login -> UserData: 添加新用户信息，写入文件
+      Login -> Login: 创建用户文件夹、收藏、历史记录
+      Login --> User: 注册成功
+  else 用户名已存在
+      Login --> User: 注册失败
+  end
+}
+
+'--------------------------------------------------
+package "菜谱生成详细流程" {
+  actor User
+  participant "菜谱生成流水线" as Pipeline
+  participant "偏好分析模块" as PrefModule
+  participant "生成模块" as GenModule
+  participant "图片生成模块" as ImgModule
+  participant "营养分析模块" as NutriModule
+  participant "UML序列图生成模块" as UMLModule
+  participant "数据存储" as Storage
+
+  User -> Pipeline: 输入食材、菜系、偏好（可选）
+  Pipeline -> PrefModule: 生成用户偏好（若无则跳过）
+  PrefModule --> Pipeline: 返回偏好数据
+  Pipeline -> GenModule: 根据偏好生成菜谱内容
+  GenModule --> Pipeline: 返回菜谱详细数据
+  Pipeline -> GenModule: 生成菜谱名称
+  Pipeline -> GenModule: 生成菜品外观描述
+  Pipeline -> ImgModule: 生成菜品主图像
+  Pipeline -> NutriModule: 生成营养分析数据
+  Pipeline -> UMLModule: 生成制作步骤UML序列图
+  Pipeline -> ImgModule: 生成每步骤对应图片
+  ImgModule --> Pipeline: 返回步骤图片列表
+  Pipeline -> Storage: 保存完整菜谱数据
+  Pipeline --> User: 返回完整菜谱信息对象
+}
+
+'--------------------------------------------------
+package "收藏与历史记录管理流程" {
+  actor User
+  participant "用户模块" as UserModule
+  participant "数据存储" as Storage
+
+  User -> UserModule: 收藏菜谱
+  UserModule -> Storage: 保存菜谱到收藏文件夹
+  UserModule -> UserModule: 更新用户偏好数据
+  UserModule --> User: 收藏成功反馈
+
+  User -> UserModule: 查看收藏菜谱
+  UserModule -> Storage: 读取收藏夹菜谱文件
+  Storage --> UserModule: 返回菜谱数据
+  UserModule --> User: 显示收藏菜谱
+
+  User -> UserModule: 查看历史记录
+  UserModule -> Storage: 读取历史记录文件
+  Storage --> UserModule: 返回历史记录数据
+  UserModule --> User: 显示历史记录
+
+  User -> UserModule: 浏览菜谱，保存历史记录
+  UserModule -> Storage: 保存菜谱到历史记录文件夹
+  UserModule --> User: 历史记录更新反馈
+}
+
+'--------------------------------------------------
+package "查看菜谱与图片交互流程" {
+  actor User
+  participant "前端界面" as Frontend
+  participant "后端服务" as Backend
+  participant "数据存储" as Storage
+
+  User -> Frontend: 选择查看菜谱
+  Frontend -> Backend: 请求菜谱数据
+  Backend -> Storage: 读取菜谱文件
+  Storage --> Backend: 返回菜谱数据
+  Backend --> Frontend: 传输菜谱信息
+  Frontend --> User: 显示菜谱详情
+
+  User -> Frontend: 点击查看步骤图片
+  Frontend -> Backend: 请求步骤图片数据
+  Backend -> Storage: 读取步骤图片
+  Storage --> Backend: 返回图片数据
+  Backend --> Frontend: 返回步骤图片
+  Frontend --> User: 显示步骤图片
+
+  User -> Frontend: 点击查看成品图片
+  Frontend -> Backend: 请求成品图片
+  Backend -> Storage: 读取成品图片
+  Storage --> Backend: 返回成品图片数据
+  Backend --> Frontend: 返回成品图片
+  Frontend --> User: 显示成品图片
+}
+
 @enduml
