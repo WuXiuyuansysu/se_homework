@@ -1,29 +1,114 @@
 @startuml class
+
 class App {
   +Flask app
   +route('/')
+  +route('/login')
+  +route('/logout')
+  +route('/index')
   +route('/generate')
+  +route('/profile')
+  +route('/load_recipe')
+  +route('/favorite')
+  +route('/delete_recipe')
+  +route('/clear_history')
 }
 
-class RecipeGenerator {
-  +generate_recipe()
+class RecipeGenerationPipeline {
+  -ingredients: str
+  -cuisine_type: str
+  -preferences: str | None
+  -recipe: dict | None
+  -name: str | None
+  -appearance_desc: str | None
+  -dish_image: PIL.Image | None
+  -nutrition: dict | None
+  -uml_sequence: PIL.Image | None
+  -step_images: list[PIL.Image] | None
+
+  +execute() : Recipe | dict
+  +execute_with_preferences() : Recipe | dict
+  +format_response() : dict
+  +image_to_base64(image: PIL.Image) : str
 }
 
-class ImageGenerator {
-  +generate_dish_image()
-  +generate_steps_image()
+class User {
+  -username: str
+  -filepath: str
+  -likes: list
+  -history: list
+  -preferences_file: str
+
+  +load_user_likes() : list
+  +load_user_history() : list
+  +generate_preferences()
+  +update_preferences_file()
+  +get_preferences() : str | None
+  +save_recipe_to_likes(recipe: Recipe)
+  +load_recipe_from_likes(filename: str) : Recipe | None
+  +load_recipe_from_history(filename: str) : Recipe | None
+  +save_recipe_to_history(recipe: Recipe, prefer: bool = False)
+  +create_user_folder()
+  +create_likes_folder()
+  +create_history_folder()
+  +setup()
+  +delete_recipe_from_likes(filename: str)
+  +delete_recipe_from_history(filename: str)
+  +clear_history()
 }
 
-class DescriptionGenerator {
-  +generate_image_description()
+class Recipe {
+  -name: str
+  -recipe: list
+  -steps_imgs: list
+  -total_img: str
+  -dish_nutrition: dict
+  -uml_sequence: any
+
+  +to_dict() : dict
 }
 
-App --> RecipeGenerator : 使用
-App --> ImageGenerator : 使用
-App --> DescriptionGenerator : 使用
+class login {
+  -success: bool
+  -username: str | None
+  -User: User | None
 
-note right of ImageGenerator
-  负责生成步骤图片(1.png...)
-  和成品图片(dish_image.png)
+  +load_user(username: str) : bool
+  +authenticate(username: str, password: str) : bool
+  +register(username: str, password: str) : bool
+}
+
+' 依赖关系
+App --> login : 使用
+App --> User : 使用
+App --> RecipeGenerationPipeline : 使用
+App --> Recipe : 使用
+
+RecipeGenerationPipeline --> Recipe : 生成菜谱对象
+User --> Recipe : 管理用户的菜谱收藏与历史
+login --> User : 管理用户信息
+
+note right of RecipeGenerationPipeline
+  菜谱生成流水线
+  - 包括菜谱生成、菜名、描述、图片、营养分析和UML图
 end note
+
+note right of User
+  用户管理：
+  - 收藏、历史、偏好管理
+  - 文件夹及文件管理
+end note
+
+note right of login
+  登录管理：
+  - 注册、认证、用户信息加载
+end note
+
+note right of App
+  Flask Web 应用：
+  - 用户交互界面
+  - 路由及请求处理
+  - 会话管理
+end note
+
 @enduml

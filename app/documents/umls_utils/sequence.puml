@@ -1,41 +1,101 @@
 @startuml sequence
 
 title AI 菜谱生成系统序列图
+
 actor User as user
-participant "app.py" as app
-participant "generate_recipe.py" as recipe_gen
-participant "generate_steps_image.py" as steps_img
-participant "generate_image_description.py" as desc_gen
-participant "generate_dish_image.py" as dish_img
+participant "Flask App (app.py)" as app
+participant "RecipeGenerationPipeline" as pipeline
+participant "DescriptionGenerator" as desc_gen
+participant "ImageGenerator" as img_gen
 database "Pictures\n(1.png, 2.png...)" as pics
+participant "User Manager (class_user.py)" as user_mgr
+participant "Recipe Manager (class_recipe.py)" as recipe_mgr
+participant "Login Manager (class_login.py)" as login_mgr
 
-user -> app : POST /generate\n(原料, 菜系风格)
+== 用户登录流程 ==
+user -> app : GET /login
 activate app
+app --> user : 登录页面login.html
+deactivate app
 
-app -> recipe_gen : generate_recipe(ingredients, cuisine_type)
-activate recipe_gen
-recipe_gen --> app : 菜谱JSON\n(名称,原料,步骤)
-deactivate recipe_gen
+user -> app : POST /login\n(username, password, action)
+activate app
+app -> login_mgr : authenticate(username, password)
+activate login_mgr
+login_mgr --> app : success / fail
+deactivate login_mgr
+app --> user : 登录结果 JSON
+deactivate app
 
-app -> desc_gen : generate_image_description(recipe)
-activate desc_gen
-desc_gen --> app : 图片描述JSON
-deactivate desc_gen
+== 菜谱生成流程 ==
+user -> app : POST /generate\n(ingredients, cuisine_type, prefer_recipe)
+activate app
+app -> user_mgr : User(username)
+activate user_mgr
+user_mgr --> app : User对象
+deactivate user_mgr
 
-app -> steps_img : generate_steps_image(recipe)
-activate steps_img
-steps_img --> pics : 保存步骤图片\n(1.png, 2.png...)
-steps_img --> app : 步骤图片路径列表
-deactivate steps_img
+alt prefer_recipe == True
+    app -> user_mgr : get_preferences()
+    user_mgr --> app : preferences
+    app -> pipeline : execute_with_preferences(ingredients, cuisine_type, preferences)
+else
+    app -> pipeline : execute(ingredients, cuisine_type)
+end
+activate pipeline
+pipeline --> app : Recipe对象 或 error dict
+deactivate pipeline
 
-app -> dish_img : generate_dish_image(description)
-activate dish_img
-dish_img --> pics : 保存成品图片\n(dish_image.png)
-dish_img --> app : 成品图片路径
-deactivate dish_img
+app -> recipe_mgr : to_dict() 转换数据结构
+app -> user_mgr : save_recipe_to_history(recipe)
+activate user_mgr
+user_mgr --> app : 保存成功
+deactivate user_mgr
 
-app --> user : 返回响应\n(菜谱+图片URL)
+app --> user : 菜谱 + 图片 URLs + 营养 + UML JSON
+deactivate app
+
+== 加载菜谱流程 ==
+user -> app : GET /load_recipe?type=likes/history&filename=xxx
+activate app
+app -> user_mgr : load_recipe_from_likes/history(filename)
+activate user_mgr
+user_mgr --> app : Recipe对象
+deactivate user_mgr
+app --> user : 菜谱 JSON
+deactivate app
+
+== 收藏菜谱流程 ==
+user -> app : POST /favorite\n(recipe name)
+activate app
+app -> user_mgr : load_recipe_from_history(name + ".json")
+activate user_mgr
+user_mgr --> app : Recipe对象
+app -> user_mgr : save_recipe_to_likes(recipe)
+app -> user_mgr : update_preferences_file()
+user_mgr --> app : 操作成功
+deactivate user_mgr
+app --> user : 收藏成功 JSON
+deactivate app
+
+== 删除菜谱流程 ==
+user -> app : POST /delete_recipe\n(type, filename)
+activate app
+app -> user_mgr : delete_recipe_from_likes/history(filename)
+activate user_mgr
+user_mgr --> app : 删除成功
+deactivate user_mgr
+app --> user : 删除成功 JSON
+deactivate app
+
+== 清空历史记录 ==
+user -> app : POST /clear_history
+activate app
+app -> user_mgr : clear_history()
+activate user_mgr
+user_mgr --> app : 清空成功
+deactivate user_mgr
+app --> user : 清空成功 JSON
 deactivate app
 
 @enduml
-

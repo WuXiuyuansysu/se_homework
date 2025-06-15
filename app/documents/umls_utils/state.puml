@@ -1,19 +1,67 @@
 @startuml state
 [*] --> Idle
 
-state Idle
-state "Processing" as processing {
-  state "生成菜谱" as gen_recipe
-  state "生成步骤图" as gen_steps
-  state "生成成品图" as gen_dish
+state Idle {
+  note right: 等待用户请求
 }
 
-Idle --> gen_recipe : 收到请求
-gen_recipe --> gen_steps : 菜谱生成成功
-gen_steps --> gen_dish : 步骤图生成成功
-gen_dish --> Idle : 成品图生成完成
+state "Processing" as processing {
+  state "生成菜谱" as gen_recipe {
+    [*] --> InputProcessing : 开始处理输入
+    InputProcessing --> PrefAnalysis : 进行用户偏好分析
+    PrefAnalysis --> RecipeGen : 根据偏好生成菜谱内容
+    RecipeGen --> NameGen : 生成菜谱名称
+    NameGen --> AppearanceGen : 生成菜品外观描述
+    AppearanceGen --> gen_recipe_done : 菜谱生成完成
 
-gen_recipe --> [*] : 生成失败
-gen_steps --> [*] : 生成失败
-gen_dish --> [*] : 生成失败
+    gen_recipe_done --> [*]
+
+    InputProcessing --> [*] : 输入无效或失败
+    PrefAnalysis --> [*] : 偏好分析失败
+    RecipeGen --> [*] : 菜谱生成失败
+    NameGen --> [*] : 名称生成失败
+    AppearanceGen --> [*] : 外观描述生成失败
+  }
+
+  state "生成步骤图" as gen_steps {
+    [*] --> StepImgGen : 生成每个步骤的图片
+    StepImgGen --> StepImgDone : 步骤图生成完成
+
+    StepImgGen --> [*] : 步骤图生成失败
+  }
+
+  state "生成成品图" as gen_dish {
+    [*] --> DishImgGen : 生成菜品成品主图
+    DishImgGen --> DishImgDone : 成品图生成完成
+
+    DishImgGen --> [*] : 成品图生成失败
+  }
+
+  state "生成营养分析" as gen_nutrition {
+    [*] --> NutritionGen : 生成营养分析数据
+    NutritionGen --> NutritionDone : 营养分析完成
+
+    NutritionGen --> [*] : 营养分析失败
+  }
+
+  state "生成UML序列图" as gen_uml {
+    [*] --> UMLGen : 生成制作步骤UML序列图
+    UMLGen --> UMLDone : UML图生成完成
+
+    UMLGen --> [*] : UML图生成失败
+  }
+
+  gen_recipe --> gen_nutrition : 菜谱生成成功
+  gen_nutrition --> gen_uml : 营养分析完成
+  gen_uml --> gen_steps : UML序列图生成完成
+  gen_steps --> gen_dish : 步骤图生成完成
+  gen_dish --> [*] : 成品图生成完成
+}
+
+Idle --> gen_recipe : 收到生成菜谱请求
+gen_recipe --> Idle : 失败或取消
+gen_nutrition --> Idle : 失败或取消
+gen_uml --> Idle : 失败或取消
+gen_steps --> Idle : 失败或取消
+gen_dish --> Idle : 失败或取消
 @enduml
