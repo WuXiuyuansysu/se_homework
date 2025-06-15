@@ -3,7 +3,9 @@
 > 基于自然语言处理与图像生成模型，支持用户根据食材、口味偏好与菜系风格快速生成个性化菜谱，并可自动生成图文并茂的步骤指导与成品图。
 
 ---
-
+&emsp;
+&emsp;
+&emsp;
 ## 🔧 开发要求
 
 - Python 3.8+
@@ -12,7 +14,9 @@
 - 所有路径说明均以 `./` 为当前目录标识
 
 ---
-
+&emsp;
+&emsp;
+&emsp;
 ## 📁 项目结构与文件说明
 
 ```text
@@ -45,6 +49,9 @@
 │
 └── README.md                       # 当前项目说明文件
 ```
+&emsp;
+&emsp;
+&emsp;
 ## 🚀 运行方式
 
 ### 本地运行主程序
@@ -61,6 +68,9 @@ python test.py
 ```
 测试文件内可自定义输入、查看输出格式、验证路径是否正确。
 
+&emsp;
+&emsp;
+&emsp;
 ## 🔍 各模块功能详解
 
 ### 1. 主入口模块 `app.py`
@@ -151,6 +161,9 @@ python test.py
 - 所有输出路径会在 Flask 返回或 CLI 打印中明确标出
 
 
+&emsp;
+&emsp;
+&emsp;
 ## 🖼️ UML 图与系统建模
 
 ### 详见 ./documents/ 下：
@@ -169,6 +182,9 @@ python test.py
 
     软件测试与质量保证报告.md
 
+&emsp;
+&emsp;
+&emsp;
 ## 🖼️ UML 图与系统建模
 
 ### 🔹 UML 图位置（位于 `./documents/` 目录）：
@@ -193,7 +209,9 @@ python test.py
 - `软件测试与质量保证报告.md`
 
 ---
-
+&emsp;
+&emsp;
+&emsp;
 ## ✅ 项目依赖（`requirements.txt`）
 
 请使用以下命令安装项目依赖：
@@ -201,7 +219,9 @@ python test.py
 ```bash
 pip install -r documents/requirements.txt
 ```
-
+&emsp;
+&emsp;
+&emsp;
 ## 🧪 测试与质量保障
 
 测试说明详见 [`软件测试与质量保证报告.md`](./documents/软件测试与质量保证报告.md)，主要涵盖以下内容：
@@ -219,7 +239,9 @@ pip install -r documents/requirements.txt
   测试是否能够成功保存图片至指定路径，图片是否符合格式要求（如 `.png`、RGB 模式、清晰度等）。
 
 ---
-
+&emsp;
+&emsp;
+&emsp;
 ## 📌 注意事项
 
 - 所有图片默认保存至 `./pictures/`，请确保该目录存在。
@@ -230,7 +252,9 @@ pip install -r documents/requirements.txt
   - 模型服务状态是否在线
 
 ---
-
+&emsp;
+&emsp;
+&emsp;
 ## 📫 联系与反馈
 
 - 本项目用于课程设计、AI 应用原型研究或小型定制系统开发。
