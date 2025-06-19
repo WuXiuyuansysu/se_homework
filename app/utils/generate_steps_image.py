@@ -20,8 +20,10 @@ def get_recipe_steps_description(recipe):
                        按照菜谱中步骤顺序排列。
     """
     steps_description = list()
+    all_des = ""
     for item in recipe['steps']:
-        steps_description.append((item['step'], item['description']))
+        all_des += (str(item['step']) + ": " + str(item['description']) + "\n")
+        steps_description.append((item['step'], all_des))
     return steps_description
 
 def generate_steps_image(recipe):
@@ -49,7 +51,9 @@ def generate_steps_image(recipe):
     steps_description = get_recipe_steps_description(recipe)
     step_imgs = list()
     for step_description in steps_description:
-        prompt = step_description[1]
+        prompt = "在前面步骤的基础之上(如果有)生成最后一个步骤对应的图片\n" + step_description[1]
+        # prompt = ""
+        # prompt += step_description[1]
         rsp = ImageSynthesis.call(api_key=config.API_KEY_0,
                         model="wanx2.1-t2i-turbo",
                         prompt=prompt,
