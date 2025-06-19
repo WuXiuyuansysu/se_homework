@@ -1,0 +1,17 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+participant Chef
+participant Kitchen
+Chef -> Kitchen : 将土豆去皮，切成块状；洋葱切丝；鸡肉切成块备用。
+return 10分钟
+Chef -> Kitchen : 在锅中加入橄榄油，加热至中火，放入鸡肉翻炒至变色。
+return 5分钟
+Chef -> Kitchen : 加入洋葱丝翻炒2分钟，直至洋葱变软。
+return 2分钟
+Chef -> Kitchen : 将土豆块加入锅中，与鸡肉和洋葱混合均匀。
+return 1分钟
+Chef -> Kitchen : 撒入盐、黑胡椒粉、迷迭香和大蒜粉，翻拌均匀后加水没过食材。
+return 2分钟
+Chef -> Kitchen : 盖上锅盖，用中小火炖煮20分钟，直至土豆熟透且汤汁浓稠。
+return 20分钟
+@enduml

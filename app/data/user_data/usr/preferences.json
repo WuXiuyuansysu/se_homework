@@ -1,0 +1,21 @@
+{
+    "ingredient_preferences": {
+        "番茄": 0.333,
+        "鸡蛋": 0.333,
+        "鸡肉": 0.333
+    },
+    "nutrition_preferences": {
+        "calories": 580.0,
+        "protein": 35.0,
+        "fat": 20.0
+    },
+    "flavor_preferences": {
+        "spicy": 0.0,
+        "sweet": 0.0,
+        "sour": 0.0,
+        "salty": 0.0,
+        "bitter": 0.0
+    },
+    "category_preferences": {},
+    "cooking_time_preference": 0
+}
