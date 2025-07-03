@@ -25,15 +25,12 @@
 ├── test.py                         # 用于单元测试、接口测试等
 │
 ├── documents/                      # 项目文档目录
-│   ├── requirements.txt            # 所有依赖库说明
-│   ├── *.png                       # 所有 UML 图（use_case.png, class.png 等）
-│   ├── *.md                        # 项目相关报告（测试、建模、说明书等）
 │   └── umls_utils/                 # PlantUML 图生成工具脚本
 │
 ├── classes/                        # 所有核心类
-│   ├── class_login.py              # 用户认证、注册模块
-│   ├── class_recipe.py             # Recipe 类（结构体定义）
-│   ├── class_user.py               # 用户类（历史、偏好、收藏）
+│   ├── login.py                    # 用户认证、注册模块
+│   ├── Recipe.py                   # Recipe 类（结构体定义）
+│   ├── User.py                     # 用户类（历史、偏好、收藏）
 │   └── RecipeGeneratePipline.py    # 菜谱生成主流程管理类
 │
 ├── utils/                          # 各功能模块函数实现
@@ -83,14 +80,14 @@ python test.py
 
 ### 2. 类定义模块（`./classes`）
 
-#### `class_login.py`
+#### `login.py`
 
 - 类 `login`：
   - `authenticate()`：验证用户密码
   - `register()`：新建用户并创建文件夹结构
   - `load_user()`：读取用户数据
 
-#### `class_user.py`
+#### `User.py`
 
 - 类 `User`：
   - 收藏管理：
@@ -103,7 +100,7 @@ python test.py
     - `generate_preferences()`
     - `update_preferences_file()`
 
-#### `class_recipe.py`
+#### `Recipe.py`
 
 - 类 `Recipe`：
   - 属性包括：
@@ -166,7 +163,7 @@ python test.py
 &emsp;
 ## 🖼️ UML 图与系统建模
 
-### 详见 ./documents/ 下：
+### 详见 se_homework/documents/ 下：
 
     user_case.png：展示用户行为与系统的主要交互流程
 

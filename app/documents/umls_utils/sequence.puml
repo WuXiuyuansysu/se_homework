@@ -8,9 +8,9 @@ participant "RecipeGenerationPipeline" as pipeline
 participant "DescriptionGenerator" as desc_gen
 participant "ImageGenerator" as img_gen
 database "Pictures\n(1.png, 2.png...)" as pics
-participant "User Manager (class_user.py)" as user_mgr
-participant "Recipe Manager (class_recipe.py)" as recipe_mgr
-participant "Login Manager (class_login.py)" as login_mgr
+participant "User Manager (User.py)" as user_mgr
+participant "Recipe Manager (Recipe.py)" as recipe_mgr
+participant "Login Manager (login.py)" as login_mgr
 
 == 用户登录流程 ==
 user -> app : GET /login

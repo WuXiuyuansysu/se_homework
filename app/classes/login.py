@@ -1,4 +1,4 @@
-from classes.class_user import User
+from classes.User import User
 import json
 
 class login:

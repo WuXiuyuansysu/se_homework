@@ -7,7 +7,7 @@ from utils.generate_diagram import build_sequence
 from utils.generate_prefer_recipe import generate_prefer_recipe
 import base64
 from io import BytesIO
-from classes.class_recipe import Recipe
+from classes.Recipe import Recipe
 import json
 
 class RecipeGenerationPipeline:
