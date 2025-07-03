@@ -25,9 +25,6 @@
 ├── test.py                         # 用于单元测试、接口测试等
 │
 ├── documents/                      # 项目文档目录
-│   ├── requirements.txt            # 所有依赖库说明
-│   ├── *.png                       # 所有 UML 图（use_case.png, class.png 等）
-│   ├── *.md                        # 项目相关报告（测试、建模、说明书等）
 │   └── umls_utils/                 # PlantUML 图生成工具脚本
 │
 ├── classes/                        # 所有核心类
@@ -166,7 +163,7 @@ python test.py
 &emsp;
 ## 🖼️ UML 图与系统建模
 
-### 详见 ./documents/ 下：
+### 详见 se_homework/documents/ 下：
 
     user_case.png：展示用户行为与系统的主要交互流程
 
