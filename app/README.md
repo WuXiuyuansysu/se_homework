@@ -31,9 +31,9 @@
 │   └── umls_utils/                 # PlantUML 图生成工具脚本
 │
 ├── classes/                        # 所有核心类
-│   ├── class_login.py              # 用户认证、注册模块
-│   ├── class_recipe.py             # Recipe 类（结构体定义）
-│   ├── class_user.py               # 用户类（历史、偏好、收藏）
+│   ├── login.py              # 用户认证、注册模块
+│   ├── Recipe.py             # Recipe 类（结构体定义）
+│   ├── User.py               # 用户类（历史、偏好、收藏）
 │   └── RecipeGeneratePipline.py    # 菜谱生成主流程管理类
 │
 ├── utils/                          # 各功能模块函数实现
@@ -83,14 +83,14 @@ python test.py
 
 ### 2. 类定义模块（`./classes`）
 
-#### `class_login.py`
+#### `login.py`
 
 - 类 `login`：
   - `authenticate()`：验证用户密码
   - `register()`：新建用户并创建文件夹结构
   - `load_user()`：读取用户数据
 
-#### `class_user.py`
+#### `User.py`
 
 - 类 `User`：
   - 收藏管理：
@@ -103,7 +103,7 @@ python test.py
     - `generate_preferences()`
     - `update_preferences_file()`
 
-#### `class_recipe.py`
+#### `Recipe.py`
 
 - 类 `Recipe`：
   - 属性包括：

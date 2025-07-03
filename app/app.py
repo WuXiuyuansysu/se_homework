@@ -1,10 +1,10 @@
 from math import log
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
-from classes.class_login import login
+from classes.login import login
 from classes.RecipeGenerationPipeline import RecipeGenerationPipeline
-from classes.class_user import User
-from classes.class_recipe import Recipe
-from classes.class_login import login
+from classes.User import User
+from classes.Recipe import Recipe
+from classes.login import login
 import json
 import os
 
