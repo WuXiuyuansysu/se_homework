@@ -31,9 +31,9 @@ app
 │   └── umls_utils/                 # PlantUML 图生成工具脚本
 │
 ├── classes/                        # 所有核心类
-│   ├── login.py              # 用户认证、注册模块
-│   ├── Recipe.py             # Recipe 类（结构体定义）
-│   ├── User.py               # 用户类（历史、偏好、收藏）
+│   ├── login.py                    # 用户认证、注册模块
+│   ├── Recipe.py                   # Recipe 类（结构体定义）
+│   ├── User.py                     # 用户类（历史、偏好、收藏）
 │   └── RecipeGeneratePipline.py    # 菜谱生成主流程管理类
 │
 ├── utils/                          # 各功能模块函数实现
